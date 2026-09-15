@@ -229,7 +229,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent-primary); box-
 [data-theme="dark"] .sheet{box-shadow:0 -8px 30px rgba(0,0,0,.35);}
 .driver-card{display:flex; gap:1em; align-items:flex-start; padding:1em; border:1px solid var(--border); border-radius:var(--radius-sm); margin-bottom:.9em; background:var(--bg-secondary); transition:box-shadow .2s var(--ease), transform .2s var(--ease), border-color .2s;}
 .driver-card:hover, .driver-card:focus-within{box-shadow:var(--shadow-md); transform:translateY(-2px); border-color:var(--accent-primary);}
-.driver-avatar{width:52px; height:52px; border-radius:50%; background:linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; flex:none; font-size:1.15rem; box-shadow:var(--shadow-sm);}
+.driver-avatar{width:52px; height:52px; border-radius:50%; background:linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; flex:none; font-size:1.15rem; box-shadow:var(--shadow-sm); overflow:hidden;}
+.driver-avatar img{width:100%; height:100%; object-fit:cover; display:block; border-radius:50%;}
 .driver-meta{flex:1;}
 .driver-tags{display:flex; flex-wrap:wrap; gap:.4em; margin-top:.5em;}
 .recommended{border:2px solid var(--accent-secondary); background:linear-gradient(135deg, rgba(217,119,6,.04), rgba(217,119,6,.01));}
@@ -532,7 +533,7 @@ input, select, textarea{ font-size:16px; }
 
       <div class="landing-actions">
         <button class="btn btn-gold btn-block" onclick="goTo('screen-login')">Iniciar sesión</button>
-        <button class="btn btn-outline btn-block" style="background:transparent;color:var(--text-primary);border-color:var(--border);" onclick="goTo('screen-register-role')">Crear una cuenta</button>
+        <button class="btn btn-outline btn-block" style="background:transparent;color:var(--text-primary);border-color:var(--border);" onclick="goTo('screen-register-client')">Crear una cuenta</button>
       </div>
 
       <p class="trust-note">Rutas calculadas por calles reales con OpenStreetMap · Prototipo de proyecto de grado — AccessRide Colombia usa datos simulados y no procesa pagos reales.</p>
@@ -565,39 +566,8 @@ input, select, textarea{ font-size:16px; }
       </form>
       <button type="button" class="btn btn-outline btn-block" style="margin-top:1em;" onclick="handleDemoLogin()">🧪 Ingresar para prueba</button>
       <p class="help" style="text-align:center;margin-bottom:0;margin-top:.6em;">Crea una cuenta de prueba con datos inventados, sin necesidad de registrarte.</p>
-      <p style="margin-top:1.4em;text-align:center;">¿No tienes cuenta? <a href="#" onclick="goTo('screen-register-role');return false;">Regístrate aquí</a></p>
+      <p style="margin-top:1.4em;text-align:center;">¿No tienes cuenta? <a href="#" onclick="goTo('screen-register-client');return false;">Regístrate aquí</a></p>
       <p class="help" style="text-align:center;margin-bottom:0;margin-top:.8em;">Demo: puedes crear una cuenta nueva o usar cualquier correo registrado previamente en esta sesión.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ============================================================ -->
-<!-- REGISTER: choose role -->
-<!-- ============================================================ -->
-<section id="screen-register-role" class="screen" aria-label="Registro">
-  <header class="topbar">
-    <button style="background:none;border:none;" onclick="goTo('screen-landing')" aria-label="Volver">← Volver</button>
-    <span class="brand">Crear cuenta</span>
-    <span style="width:70px"></span>
-  </header>
-  <div class="container">
-    <div class="card" style="margin-top:.5em;">
-      <h2 style="margin-bottom:.2em;">¿Cómo quieres usar AccessRide?</h2>
-      <p class="help" style="margin-bottom:1.4em;">Elige el tipo de cuenta que necesitas. Podrás completar tu perfil en el siguiente paso.</p>
-      <button class="btn btn-primary btn-block" style="margin-bottom:1em; justify-content:flex-start; text-align:left; padding:1.2em 1.4em;" onclick="goTo('screen-register-client')">
-        <span style="font-size:1.4em; margin-right:.3em;">🧑‍🦽</span>
-        <div>
-          <div style="font-weight:800;">Soy usuario</div>
-          <div style="font-size:.9rem; font-weight:400; opacity:.8;">Necesito transporte accesible</div>
-        </div>
-      </button>
-      <button class="btn btn-outline btn-block" style="justify-content:flex-start; text-align:left; padding:1.2em 1.4em;" onclick="goTo('screen-register-driver')">
-        <span style="font-size:1.4em; margin-right:.3em;">🚐</span>
-        <div>
-          <div style="font-weight:800;">Soy conductor</div>
-          <div style="font-size:.9rem; font-weight:400; opacity:.8;">Ofrezco un vehículo adaptado</div>
-        </div>
-      </button>
     </div>
   </div>
 </section>
@@ -607,16 +577,29 @@ input, select, textarea{ font-size:16px; }
 <!-- ============================================================ -->
 <section id="screen-register-client" class="screen" aria-label="Registro de usuario cliente">
   <header class="topbar">
-    <button style="background:none;border:none;" onclick="goTo('screen-register-role')" aria-label="Volver">← Volver</button>
+    <button style="background:none;border:none;" onclick="goTo('screen-landing')" aria-label="Volver">← Volver</button>
     <span class="brand">Registro — Usuario</span>
     <span style="width:70px"></span>
   </header>
   <div class="container">
     <form id="form-client" onsubmit="return handleRegisterClient(event)">
       <fieldset>
+        <legend>Foto de perfil</legend>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:.8em;">
+          <div class="driver-avatar" id="c-avatar-preview" style="width:96px;height:96px;font-size:2rem;"></div>
+          <input id="c-foto" type="file" accept="image/*" class="sr-only" onchange="onProfilePhotoChange(event)">
+          <div style="display:flex; gap:.6em; flex-wrap:wrap; justify-content:center;">
+            <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('c-foto').click()">📷 Subir foto</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="c-foto-remove-btn" onclick="removeProfilePhoto()" style="display:none;">Quitar foto</button>
+          </div>
+          <p class="help" style="margin:0; text-align:center;">Mientras no subas una foto, usaremos un avatar generado automáticamente con tu nombre.</p>
+        </div>
+      </fieldset>
+
+      <fieldset>
         <legend>Datos personales</legend>
         <label for="c-nombre">Nombre completo</label>
-        <input id="c-nombre" type="text" required placeholder="Ej: María Fernanda Ríos">
+        <input id="c-nombre" type="text" required placeholder="Ej: María Fernanda Ríos" oninput="updateAvatarPreview()">
 
         <label for="c-doc">Documento de identidad</label>
         <input id="c-doc" type="text" required inputmode="numeric" placeholder="Cédula de ciudadanía">
@@ -680,98 +663,6 @@ input, select, textarea{ font-size:16px; }
 
         <label for="c-contacto-tel">Teléfono del contacto</label>
         <input id="c-contacto-tel" type="tel" required placeholder="300 000 0000">
-      </fieldset>
-
-      <button type="submit" class="btn btn-primary btn-block">Crear cuenta y continuar</button>
-    </form>
-  </div>
-</section>
-
-<!-- ============================================================ -->
-<!-- REGISTER: DRIVER -->
-<!-- ============================================================ -->
-<section id="screen-register-driver" class="screen" aria-label="Registro de conductor">
-  <header class="topbar">
-    <button style="background:none;border:none;" onclick="goTo('screen-register-role')" aria-label="Volver">← Volver</button>
-    <span class="brand">Registro — Conductor</span>
-    <span style="width:70px"></span>
-  </header>
-  <div class="container">
-    <form id="form-driver" onsubmit="return handleRegisterDriver(event)">
-      <fieldset>
-        <legend>Datos personales</legend>
-        <label for="d-nombre">Nombre completo</label>
-        <input id="d-nombre" type="text" required placeholder="Ej: Carlos Ramírez">
-
-        <label for="d-doc">Documento colombiano</label>
-        <input id="d-doc" type="text" required inputmode="numeric" placeholder="Número de cédula">
-
-        <label for="d-tel">Teléfono</label>
-        <input id="d-tel" type="tel" required placeholder="300 000 0000">
-
-        <label for="d-correo">Correo electrónico</label>
-        <input id="d-correo" type="email" required placeholder="tu@email.com">
-
-        <label for="d-pass">Contraseña</label>
-        <input id="d-pass" type="password" required minlength="6" placeholder="Mínimo 6 caracteres">
-
-        <label for="d-licencia">Licencia de conducción</label>
-        <input id="d-licencia" type="text" required placeholder="Número de licencia">
-      </fieldset>
-
-      <fieldset>
-        <legend>Datos del vehículo</legend>
-        <label for="d-marca">Marca</label>
-        <input id="d-marca" type="text" required placeholder="Ej: Renault">
-
-        <label for="d-modelo">Modelo</label>
-        <input id="d-modelo" type="text" required placeholder="Ej: Trafic">
-
-        <label for="d-anio">Año</label>
-        <input id="d-anio" type="number" required min="1990" max="2027" placeholder="2022">
-
-        <label for="d-placa">Placa</label>
-        <input id="d-placa" type="text" required placeholder="ABC123">
-
-        <label for="d-tipo-veh">Tipo de vehículo</label>
-        <select id="d-tipo-veh" required>
-          <option value="">Selecciona una opción</option>
-          <option value="camioneta">Camioneta adaptada</option>
-          <option value="van">Van / bus adaptado</option>
-          <option value="sedan">Sedán</option>
-          <option value="taxi_adaptado">Taxi adaptado</option>
-        </select>
-
-        <label for="d-capacidad">Capacidad (pasajeros)</label>
-        <input id="d-capacidad" type="number" required min="1" max="20" placeholder="4">
-      </fieldset>
-
-      <fieldset>
-        <legend>Adaptaciones disponibles</legend>
-        <div class="check-row"><input type="checkbox" id="a-rampa"><label for="a-rampa" style="margin:0;font-weight:400;">Rampa para silla de ruedas</label></div>
-        <div class="check-row"><input type="checkbox" id="a-elevador"><label for="a-elevador" style="margin:0;font-weight:400;">Elevador hidráulico</label></div>
-        <div class="check-row"><input type="checkbox" id="a-espacio"><label for="a-espacio" style="margin:0;font-weight:400;">Espacio amplio para silla</label></div>
-        <div class="check-row"><input type="checkbox" id="a-fijacion"><label for="a-fijacion" style="margin:0;font-weight:400;">Sistema de fijación de silla</label></div>
-        <div class="check-row"><input type="checkbox" id="a-ayuda"><label for="a-ayuda" style="margin:0;font-weight:400;">Ayuda para subir y bajar pasajeros</label></div>
-        <div class="check-row"><input type="checkbox" id="a-visual"><label for="a-visual" style="margin:0;font-weight:400;">Adaptaciones para discapacidad visual</label></div>
-        <div class="check-row"><input type="checkbox" id="a-auditiva"><label for="a-auditiva" style="margin:0;font-weight:400;">Adaptaciones para discapacidad auditiva</label></div>
-
-        <label for="d-otras">Otras adaptaciones</label>
-        <input id="d-otras" type="text" placeholder="Describe otras adaptaciones (opcional)">
-
-        <label for="d-desc">Descripción del vehículo</label>
-        <textarea id="d-desc" rows="3" placeholder="Cuéntale a los usuarios sobre tu vehículo"></textarea>
-
-        <label for="d-foto">Fotografía del vehículo (opcional)</label>
-        <input id="d-foto" type="file" accept="image/*">
-
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-top:1.2em; padding:1em; background:var(--bg-tertiary); border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
-          <div>
-            <strong>Vehículo Pet Friendly</strong>
-            <div class="help" style="margin:0;">Permito viajes con animales de compañía</div>
-          </div>
-          <span class="toggle-switch"><input type="checkbox" id="d-petfriendly"><span class="toggle-track"></span></span>
-        </div>
       </fieldset>
 
       <button type="submit" class="btn btn-primary btn-block">Crear cuenta y continuar</button>
@@ -962,41 +853,6 @@ input, select, textarea{ font-size:16px; }
   <div class="container" id="profile-container"></div>
 </section>
 
-<!-- ============================================================ -->
-<!-- DRIVER PANEL -->
-<!-- ============================================================ -->
-<section id="screen-driver-home" class="screen" aria-label="Panel del conductor">
-  <header class="topbar">
-    <span class="brand">🚐 Panel de conductor</span>
-    <button class="btn-sm" style="background:none;border:2px solid var(--border);color:var(--text-primary);border-radius:10px;" onclick="handleLogout()">Salir</button>
-  </header>
-  <div class="container">
-    <div class="card" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.1em;">
-      <div>
-        <strong id="driver-name-label" style="color:var(--text-primary);">Conductor</strong>
-        <div class="help" style="margin:0;">Estado de disponibilidad</div>
-      </div>
-      <span class="toggle-switch"><input type="checkbox" id="driver-available" checked onchange="toggleDriverAvailability()"><span class="toggle-track"></span></span>
-    </div>
-
-    <div class="stat-grid" style="margin-bottom:1.6em;">
-      <div class="stat-tile"><span class="num" id="driver-earnings">$0</span><span class="lbl">Ganancias hoy</span></div>
-      <div class="stat-tile"><span class="num" id="driver-trips">0</span><span class="lbl">Viajes hoy</span></div>
-      <div class="stat-tile"><span class="num">4.9★</span><span class="lbl">Calificación</span></div>
-    </div>
-
-    <div class="section-title"><h3 style="margin:0;">Solicitudes cercanas</h3></div>
-    <div id="driver-requests-list"></div>
-
-    <div class="section-title"><h3 style="margin:0;">Historial de viajes</h3></div>
-    <div id="driver-history-list"></div>
-  </div>
-</section>
-
-<div id="modal-driver-trip" class="modal-backdrop hidden" role="dialog" aria-modal="true">
-  <div class="modal" id="modal-driver-trip-content"></div>
-</div>
-
 <div id="modal-emergency" class="modal-backdrop hidden" role="alertdialog" aria-modal="true" aria-labelledby="emergency-title">
   <div class="modal" style="text-align:center;">
     <h2 id="emergency-title" style="color:var(--accent-danger);">🆘 Alerta de emergencia activada</h2>
@@ -1096,7 +952,7 @@ function setContrast(enabled, silent){
 }
 
 /* ---------- State ---------- */
-const DB = { clients:{}, drivers:{} };
+const DB = { clients:{} };
 let session = null;
 let userLatLng = null;
 let userAddress = "";
@@ -1108,7 +964,6 @@ let currentTrip = null;
 let activeRide = null;
 let trackTimer = null;
 let tripHistory = [];
-let driverEarningsToday = 0, driverTripsToday = 0;
 
 const COLOMBIA_BOUNDS = { minLat:-4.3, maxLat:13.5, minLng:-79.1, maxLng:-66.8 };
 const BOGOTA = { lat:4.7110, lng:-74.0721, address:"Carrera 7 # 72-41, Bogotá D.C." };
@@ -1142,6 +997,8 @@ function goTo(id){
   if(id==='screen-client-home'){ setTimeout(initClientMap, 60); }
 }
 function announce(msg){ document.getElementById('live-region').textContent = msg; }
+function blobatarUrl(name){ return `https://blobatar.dev/avatar/${encodeURIComponent(name||'')}?background=circle`; }
+function avatarImg(name, photoUrl){ return `<img src="${photoUrl || blobatarUrl(name)}" alt="Foto de perfil de ${name}" loading="lazy">`; }
 function openModal(id){ document.getElementById(id).classList.remove('hidden'); }
 function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
 document.addEventListener('keydown', (e)=>{
@@ -1150,6 +1007,41 @@ document.addEventListener('keydown', (e)=>{
     if(m && !m.classList.contains('hidden')) closeModal('modal-settings');
   }
 });
+
+/* ---------- Profile photo (registration preview) ---------- */
+let pendingProfilePhoto = null; // dataURL of uploaded photo, or null to use blobatar
+function updateAvatarPreview(){
+  const preview = document.getElementById('c-avatar-preview');
+  if(!preview) return;
+  if(pendingProfilePhoto){
+    preview.innerHTML = `<img src="${pendingProfilePhoto}" alt="Vista previa de tu foto de perfil">`;
+  } else {
+    const nombre = document.getElementById('c-nombre')?.value || '';
+    preview.innerHTML = avatarImg(nombre || 'Usuario');
+  }
+}
+function onProfilePhotoChange(e){
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    pendingProfilePhoto = reader.result;
+    updateAvatarPreview();
+    const removeBtn = document.getElementById('c-foto-remove-btn');
+    if(removeBtn) removeBtn.style.display = 'inline-flex';
+    announce("Foto de perfil actualizada");
+  };
+  reader.readAsDataURL(file);
+}
+function removeProfilePhoto(){
+  pendingProfilePhoto = null;
+  const fileInput = document.getElementById('c-foto');
+  if(fileInput) fileInput.value = '';
+  const removeBtn = document.getElementById('c-foto-remove-btn');
+  if(removeBtn) removeBtn.style.display = 'none';
+  updateAvatarPreview();
+  announce("Foto de perfil eliminada, se usará el avatar generado");
+}
 
 /* ---------- Auth ---------- */
 function handleRegisterClient(e){
@@ -1162,6 +1054,7 @@ function handleRegisterClient(e){
     telefono: document.getElementById('c-tel').value,
     correo: email,
     pass: document.getElementById('c-pass').value,
+    foto: pendingProfilePhoto,
     tipo: document.getElementById('c-tipo').value,
     espacioSilla: document.getElementById('c-espacio').checked,
     ayudaAbordar: document.getElementById('c-ayuda').checked,
@@ -1174,40 +1067,8 @@ function handleRegisterClient(e){
   };
   DB.clients[email] = client;
   session = {type:'client', email};
+  pendingProfilePhoto = null;
   announce("Cuenta creada. Bienvenido "+client.nombre);
-  goTo('screen-location');
-  return false;
-}
-
-function handleRegisterDriver(e){
-  e.preventDefault();
-  const email = document.getElementById('d-correo').value.trim().toLowerCase();
-  const adaptations = [];
-  ['rampa','elevador','espacio','fijacion','ayuda','visual','auditiva'].forEach(k=>{
-    if(document.getElementById('a-'+k).checked) adaptations.push(k);
-  });
-  const driver = {
-    nombre: document.getElementById('d-nombre').value,
-    doc: document.getElementById('d-doc').value,
-    telefono: document.getElementById('d-tel').value,
-    correo: email,
-    pass: document.getElementById('d-pass').value,
-    licencia: document.getElementById('d-licencia').value,
-    marca: document.getElementById('d-marca').value,
-    modelo: document.getElementById('d-modelo').value,
-    anio: document.getElementById('d-anio').value,
-    placa: document.getElementById('d-placa').value,
-    tipoVehiculo: document.getElementById('d-tipo-veh').value,
-    capacidad: document.getElementById('d-capacidad').value,
-    adaptations,
-    otras: document.getElementById('d-otras').value,
-    descripcion: document.getElementById('d-desc').value,
-    petFriendly: document.getElementById('d-petfriendly').checked,
-    rating:5.0, available:true
-  };
-  DB.drivers[email] = driver;
-  session = {type:'driver', email};
-  announce("Cuenta de conductor creada. Bienvenido "+driver.nombre);
   goTo('screen-location');
   return false;
 }
@@ -1219,11 +1080,6 @@ function handleLogin(e){
   const banner = document.getElementById('login-banner');
   if(DB.clients[email] && DB.clients[email].pass===pass){
     session = {type:'client', email};
-    goTo('screen-location');
-    return false;
-  }
-  if(DB.drivers[email] && DB.drivers[email].pass===pass){
-    session = {type:'driver', email};
     goTo('screen-location');
     return false;
   }
@@ -1316,12 +1172,7 @@ function reverseGeocode(lat,lng){
 }
 
 function enterApp(){
-  if(session.type==='client'){
-    goTo('screen-client-home');
-  } else {
-    setupDriverPanel();
-    goTo('screen-driver-home');
-  }
+  goTo('screen-client-home');
 }
 
 /* ---------- Map (client) ---------- */
@@ -1391,7 +1242,7 @@ function driverCardHTML(d, recommended, reasons){
   const petTag = d.pet ? `<span class="pill pill-green">🐾 Pet Friendly</span>` : '';
   return `
   <div class="driver-card ${recommended?'recommended':''}">
-    <div class="driver-avatar">${d.name.split(' ').map(n=>n[0]).slice(0,2).join('')}</div>
+    <div class="driver-avatar">${avatarImg(d.name)}</div>
     <div class="driver-meta">
       ${recommended?'<div class="recommended-badge">⭐ Conductor recomendado</div>':''}
       <strong>${d.name}</strong> — ${d.rating.toFixed(1)}★<br>
@@ -1904,7 +1755,7 @@ function fillProfile(){
     const c = DB.clients[session.email];
     box.innerHTML = `
       <div class="card" style="text-align:center; margin-bottom:1.2em;">
-        <div class="driver-avatar" style="width:72px;height:72px;font-size:1.6rem;margin:0 auto .6em;">${c.nombre.split(' ').map(n=>n[0]).slice(0,2).join('')}</div>
+        <div class="driver-avatar" style="width:72px;height:72px;font-size:1.6rem;margin:0 auto .6em;">${avatarImg(c.nombre, c.foto)}</div>
         <h2 style="margin-bottom:.2em;">${c.nombre}</h2>
         <span class="pill pill-teal">${labelTipo(c.tipo)}</span>
       </div>
@@ -1956,84 +1807,6 @@ function saveTrustedContact(){
   c.contactoRelacion = document.getElementById('trusted-relacion').value;
   c.contactoTelefono = document.getElementById('trusted-phone').value;
   announce('Contacto de emergencia guardado');
-}
-
-/* ---------- Driver Panel ---------- */
-let driverRequests = [];
-function setupDriverPanel(){
-  const d = DB.drivers[session.email];
-  document.getElementById('driver-name-label').textContent = d.nombre;
-  document.getElementById('driver-available').checked = d.available;
-  driverEarningsToday = 0; driverTripsToday = 0;
-  updateDriverStats();
-  generateSimulatedRequests();
-}
-function toggleDriverAvailability(){
-  const d = DB.drivers[session.email];
-  d.available = document.getElementById('driver-available').checked;
-  announce(d.available ? "Ahora estás disponible" : "Ya no estás disponible");
-  document.getElementById('driver-requests-list').innerHTML = d.available ? '' : `<div class="empty-state">Actívate para ver solicitudes.</div>`;
-  if(d.available) generateSimulatedRequests();
-}
-function updateDriverStats(){
-  document.getElementById('driver-earnings').textContent = formatCOP(driverEarningsToday);
-  document.getElementById('driver-trips').textContent = driverTripsToday;
-}
-const SAMPLE_PASSENGERS = [
-  {name:"Ana Cifuentes", need:"Usuario de silla de ruedas manual", note:"Necesita rampa y ayuda para asegurar la silla."},
-  {name:"Pedro Salcedo", need:"Discapacidad visual", note:"Prefiere que le indiquen las paradas en voz alta."},
-  {name:"Sofía Muñoz", need:"Movilidad reducida, viaja con perro guía", note:"Vehículo debe ser Pet Friendly."},
-];
-function generateSimulatedRequests(){
-  const d = DB.drivers[session.email];
-  if(!d.available) return;
-  driverRequests = SAMPLE_PASSENGERS.map((p,i)=>({
-    id:i, ...p,
-    distanceKm: (1+Math.random()*4),
-    fare: calcFare(1+Math.random()*8)
-  }));
-  renderDriverRequests();
-}
-function renderDriverRequests(){
-  const box = document.getElementById('driver-requests-list');
-  if(!driverRequests.length){ box.innerHTML = `<div class="empty-state">No hay solicitudes por ahora.</div>`; return; }
-  box.innerHTML = driverRequests.map(r=>`
-    <div class="request-row">
-      <div>
-        <strong>${r.name}</strong>
-        <div class="help" style="margin:.1em 0;">${r.need}</div>
-        <div class="help" style="margin:0;">${r.distanceKm.toFixed(1)} km · ${formatCOP(r.fare)}</div>
-      </div>
-      <div style="display:flex; gap:.5em;">
-        <button class="btn btn-primary btn-sm" onclick="acceptRequest(${r.id})">Aceptar</button>
-        <button class="btn btn-ghost btn-sm" onclick="rejectRequest(${r.id})">Rechazar</button>
-      </div>
-    </div>`).join('');
-}
-function acceptRequest(id){
-  const r = driverRequests.find(x=>x.id===id);
-  if(!r) return;
-  driverEarningsToday += r.fare;
-  driverTripsToday += 1;
-  updateDriverStats();
-  driverRequests = driverRequests.filter(x=>x.id!==id);
-  renderDriverRequests();
-  renderDriverHistoryEntry(r);
-  announce("Has aceptado el viaje de "+r.name);
-}
-function rejectRequest(id){
-  driverRequests = driverRequests.filter(x=>x.id!==id);
-  renderDriverRequests();
-}
-let driverHistory = [];
-function renderDriverHistoryEntry(r){
-  driverHistory.unshift(r);
-  const box = document.getElementById('driver-history-list');
-  box.innerHTML = driverHistory.map(h=>`
-    <div class="card" style="margin-bottom:.7em;">
-      <div style="display:flex;justify-content:space-between;"><strong>${h.name}</strong><span>${formatCOP(h.fare)}</span></div>
-      <div class="help" style="margin:.2em 0 0;">${h.need}</div>
-    </div>`).join('');
 }
 
 /* ---------- Init ---------- */
