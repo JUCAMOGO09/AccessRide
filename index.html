@@ -1057,7 +1057,10 @@ function goTo(id){
   document.getElementById(id).classList.add('active');
   announce("Sección: " + (document.querySelector('#'+id+' h1, #'+id+' h2')?.textContent || id));
   window.scrollTo(0,0);
-  if(id==='screen-client-home'){ setTimeout(initClientMap, 60); }
+  if(id==='screen-client-home'){
+    clearRoutePreview();
+    setTimeout(initClientMap, 60);
+  }
   if(id==='screen-profile') fillProfile();
   if(id==='screen-history') renderTripHistory();
 }
@@ -1582,11 +1585,19 @@ function openRequestFlow(){
   closeSuggestions('pickup-manual');
   closeSuggestions('dest-address');
   document.getElementById('route-status-banner').innerHTML = '';
-  if(routePreviewLine && map){ map.removeLayer(routePreviewLine); routePreviewLine=null; }
+  clearRoutePreview();
   currentTrip = null;
   tapMode = null;
   document.getElementById('tap-mode-label').textContent = 'ninguno';
   openModal('modal-request');
+}
+
+/* Quita del mapa principal la ruta previsualizada y el marcador de destino
+   de una solicitud anterior. Se llama al volver a "Inicio" y al reabrir el
+   flujo de solicitud, para que el mapa nunca arrastre una ruta vieja. */
+function clearRoutePreview(){
+  if(routePreviewLine && map){ map.removeLayer(routePreviewLine); routePreviewLine=null; }
+  if(destMarker && map){ map.removeLayer(destMarker); destMarker=null; }
 }
 function onPickupModeChange(){
   const mode = document.getElementById('pickup-mode').value;
@@ -1912,6 +1923,35 @@ function confirmTrip(){
   setupTracking();
 }
 
+/* Recorta un tramo de ruta desde una fracción t (0–1) hasta el final,
+   así la polyline dibujada es siempre "lo que falta por recorrer" y se
+   va acortando desde el punto donde va el conductor, no desde el origen. */
+function remainingCoords(coords, t){
+  if(coords.length<2) return coords.slice();
+  t = Math.max(0, Math.min(1, t));
+  const segLens = [];
+  let total = 0;
+  for(let i=0;i<coords.length-1;i++){
+    const d = haversine(coords[i].lat, coords[i].lng, coords[i+1].lat, coords[i+1].lng);
+    segLens.push(d); total += d;
+  }
+  if(total===0) return coords.slice();
+  const target = total*t;
+  let acc = 0;
+  for(let i=0;i<segLens.length;i++){
+    if(acc+segLens[i] >= target){
+      const local = segLens[i]>0 ? (target-acc)/segLens[i] : 0;
+      const cut = {
+        lat: lerp(coords[i].lat, coords[i+1].lat, Math.max(0,Math.min(1,local))),
+        lng: lerp(coords[i].lng, coords[i+1].lng, Math.max(0,Math.min(1,local)))
+      };
+      return [cut, ...coords.slice(i+1)];
+    }
+    acc += segLens[i];
+  }
+  return [coords[coords.length-1]];
+}
+
 async function setupTracking(){
   document.getElementById('tracking-status').innerHTML = '<span class="spinner spinner-dark" aria-hidden="true"></span>Buscando la mejor ruta hacia ti…';
   document.getElementById('tracking-status').className = 'state-badge state-searching';
@@ -1927,15 +1967,15 @@ async function setupTracking(){
   const driverStart = {lat: activeRide.driver.lat, lng: activeRide.driver.lng};
   const vehicleMarker = L.marker([driverStart.lat, driverStart.lng], {icon:pinIcon('marker-driver','🚐')}).addTo(trackMap);
 
-  const [legToPickup] = await Promise.all([ fetchRoute(driverStart, activeRide.pickup) ]);
+  const legToPickup = await fetchRoute(driverStart, activeRide.pickup);
   const legToDest = activeRide.routeCoords && activeRide.routeCoords.length>1
     ? { coords: activeRide.routeCoords, distanceKm: activeRide.distanceKm, real: activeRide.routeIsReal }
     : await fetchRoute(activeRide.pickup, activeRide.dest);
 
-  if(trackRouteLine) trackMap.removeLayer(trackRouteLine);
-  const fullCoords = [...legToPickup.coords, ...legToDest.coords];
-  trackRouteLine = L.polyline(fullCoords.map(c=>[c.lat,c.lng]), {color:'#0F766E', weight:5, opacity:.85}).addTo(trackMap);
-  trackMap.fitBounds(trackRouteLine.getBounds(), {padding:[30,30]});
+  // Encuadra el mapa mostrando ambos tramos completos antes de arrancar.
+  if(trackRouteLine){ trackMap.removeLayer(trackRouteLine); trackRouteLine=null; }
+  const previewBounds = L.polyline([...legToPickup.coords, ...legToDest.coords].map(c=>[c.lat,c.lng])).getBounds();
+  trackMap.fitBounds(previewBounds, {padding:[30,30]});
 
   document.getElementById('tracking-status').innerHTML = '🚐 Tu conductor está en camino';
   document.getElementById('tracking-status').className = 'state-badge state-enroute';
@@ -1943,40 +1983,70 @@ async function setupTracking(){
   const pickupLegKm = legToPickup.distanceKm;
   const destLegKm = legToDest.distanceKm;
   const totalTripKm = pickupLegKm + destLegKm;
-  const pickupFraction = totalTripKm>0 ? pickupLegKm/totalTripKm : 0.4;
+  // Cada fase avanza a un ritmo proporcional a su propia distancia, así el
+  // conductor no "vuela" en el tramo corto ni se arrastra en el largo.
+  const pickupSteps = Math.max(8, Math.round(40 * (totalTripKm>0 ? pickupLegKm/totalTripKm : 0.4)));
+  const destSteps = Math.max(8, Math.round(40 * (totalTripKm>0 ? destLegKm/totalTripKm : 0.6)));
 
-  const totalSteps = 40;
-  let step = 0;
   if(trackTimer) clearInterval(trackTimer);
-  let pickedUp = false;
+
+  // Fase 1: el conductor recorre la ruta hacia el punto de recogida.
+  // La línea dibujada es siempre el tramo restante, así que se va acortando
+  // desde donde está el vehículo hasta el punto de recogida.
+  trackRouteLine = L.polyline(legToPickup.coords.map(c=>[c.lat,c.lng]), {color:'#D97706', weight:5, opacity:.85, lineCap:'round'}).addTo(trackMap);
+  let step = 0;
   trackTimer = setInterval(()=>{
     step++;
-    const t = step/totalSteps;
-    let pos;
-    if(t < pickupFraction){
-      pos = pointAtFraction(legToPickup.coords, pickupFraction>0 ? t/pickupFraction : 1);
-    } else {
-      if(!pickedUp){
-        pickedUp = true;
-        document.getElementById('tracking-status').innerHTML = '🧍 Pasajero a bordo — en camino al destino';
-        announce("El conductor recogió al pasajero. En camino al destino.");
-      }
-      const localT = pickupFraction<1 ? (t-pickupFraction)/(1-pickupFraction) : 1;
-      pos = pointAtFraction(legToDest.coords, localT);
-    }
+    const t = step/pickupSteps;
+    const pos = pointAtFraction(legToPickup.coords, t);
     vehicleMarker.setLatLng([pos.lat,pos.lng]);
-    document.getElementById('track-progress').style.width = (t*100)+"%";
-    const remainingKm = Math.max(0, totalTripKm*(1-t));
-    const remainingMin = Math.max(0, Math.round(activeRide.timeMin*(1-Math.max(0,(t-pickupFraction))/(1-pickupFraction||1))));
-    document.getElementById('track-time').textContent = t<pickupFraction ? activeRide.timeMin : remainingMin;
-    document.getElementById('track-dist').textContent = remainingKm.toFixed(1);
+    trackRouteLine.setLatLngs(remainingCoords(legToPickup.coords, t).map(c=>[c.lat,c.lng]));
+
+    const overallT = totalTripKm>0 ? (pickupLegKm*t)/totalTripKm : t*0.4;
+    document.getElementById('track-progress').style.width = (overallT*100)+"%";
+    document.getElementById('track-dist').textContent = Math.max(0, totalTripKm*(1-overallT)).toFixed(1);
+    document.getElementById('track-time').textContent = activeRide.timeMin;
+
     if(t>=1){
       clearInterval(trackTimer);
-      document.getElementById('tracking-status').innerHTML = "🎉 Has llegado a tu destino";
-      document.getElementById('tracking-status').className = 'state-badge state-found';
-      finishTrip();
+      startDestinationLeg();
     }
   }, 450);
+
+  function startDestinationLeg(){
+    document.getElementById('tracking-status').innerHTML = '🧍 Pasajero a bordo — en camino al destino';
+    document.getElementById('tracking-status').className = 'state-badge state-enroute';
+    announce("El conductor recogió al pasajero. En camino al destino.");
+
+    // La línea de "hacia ti" desaparece y comienza la del tramo al destino.
+    if(trackRouteLine){ trackMap.removeLayer(trackRouteLine); trackRouteLine=null; }
+    trackRouteLine = L.polyline(legToDest.coords.map(c=>[c.lat,c.lng]), {color:'#0F766E', weight:5, opacity:.85, lineCap:'round'}).addTo(trackMap);
+
+    let step2 = 0;
+    trackTimer = setInterval(()=>{
+      step2++;
+      const t = step2/destSteps;
+      const pos = pointAtFraction(legToDest.coords, t);
+      vehicleMarker.setLatLng([pos.lat,pos.lng]);
+      trackRouteLine.setLatLngs(remainingCoords(legToDest.coords, t).map(c=>[c.lat,c.lng]));
+
+      const overallT = totalTripKm>0 ? (pickupLegKm + destLegKm*t)/totalTripKm : 0.4 + t*0.6;
+      document.getElementById('track-progress').style.width = (overallT*100)+"%";
+      document.getElementById('track-dist').textContent = Math.max(0, totalTripKm*(1-overallT)).toFixed(1);
+      document.getElementById('track-time').textContent = Math.max(0, Math.round(activeRide.timeMin*(1-t)));
+
+      if(t>=1){
+        clearInterval(trackTimer);
+        if(trackRouteLine){ trackMap.removeLayer(trackRouteLine); trackRouteLine=null; }
+        document.getElementById('track-progress').style.width = "100%";
+        document.getElementById('track-dist').textContent = "0.0";
+        document.getElementById('track-time').textContent = "0";
+        document.getElementById('tracking-status').innerHTML = "🎉 Has llegado a tu destino";
+        document.getElementById('tracking-status').className = 'state-badge state-found';
+        finishTrip();
+      }
+    }, 450);
+  }
 }
 
 function lerp(a,b,t){ return a+(b-a)*t; }
