@@ -11,6 +11,14 @@
 <title>AccessRide Colombia — Transporte accesible</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+
+<!-- ============================================================ -->
+<!-- FIREBASE 10 (CDN compat) -->
+<!-- ============================================================ -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -485,6 +493,29 @@ input, select, textarea{ font-size:16px; }
 <body>
 
 <!-- ============================================================ -->
+<!-- FIREBASE INIT -->
+<!-- ============================================================ -->
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyC-4B1DROn9XeaXCjqT2jnFK2PlfzHddxo",
+    authDomain: "accessride-f6a46.firebaseapp.com",
+    projectId: "accessride-f6a46",
+    storageBucket: "accessride-f6a46.firebasestorage.app",
+    messagingSenderId: "531167174622",
+    appId: "1:531167174622:web:550cf7f02e6aa70649c74f",
+    measurementId: "G-1N18X7ETQ6"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+/* La sesión se mantiene abierta entre recargas del navegador. */
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err=>{
+  console.warn('No se pudo fijar la persistencia de sesión:', err);
+});
+</script>
+
+<!-- ============================================================ -->
 <!-- LIVE REGION for screen reader announcements -->
 <!-- ============================================================ -->
 <div id="live-region" class="sr-only" aria-live="polite"></div>
@@ -536,7 +567,7 @@ input, select, textarea{ font-size:16px; }
         <button class="btn btn-outline btn-block" style="background:transparent;color:var(--text-primary);border-color:var(--border);" onclick="goTo('screen-register-client')">Crear una cuenta</button>
       </div>
 
-      <p class="trust-note">Rutas calculadas por calles reales con OpenStreetMap · Prototipo de proyecto de grado — AccessRide Colombia usa datos simulados y no procesa pagos reales.</p>
+      <p class="trust-note">Rutas calculadas por calles reales con OpenStreetMap · Cuentas y perfiles guardados en Firebase · Prototipo de proyecto de grado — AccessRide Colombia no procesa pagos reales.</p>
     </div>
   </div>
 </section>
@@ -562,12 +593,12 @@ input, select, textarea{ font-size:16px; }
         <label for="login-pass">Contraseña</label>
         <input id="login-pass" type="password" required autocomplete="current-password" placeholder="••••••••">
 
-        <button type="submit" class="btn btn-primary btn-block" style="margin-top:1.6em;">Ingresar</button>
+        <button type="submit" class="btn btn-primary btn-block" id="btn-login" style="margin-top:1.6em;">Ingresar</button>
       </form>
-      <button type="button" class="btn btn-outline btn-block" style="margin-top:1em;" onclick="handleDemoLogin()">🧪 Ingresar para prueba</button>
+      <button type="button" class="btn btn-outline btn-block" id="btn-demo-login" style="margin-top:1em;" onclick="handleDemoLogin()">🧪 Ingresar para prueba</button>
       <p class="help" style="text-align:center;margin-bottom:0;margin-top:.6em;">Crea una cuenta de prueba con datos inventados, sin necesidad de registrarte.</p>
       <p style="margin-top:1.4em;text-align:center;">¿No tienes cuenta? <a href="#" onclick="goTo('screen-register-client');return false;">Regístrate aquí</a></p>
-      <p class="help" style="text-align:center;margin-bottom:0;margin-top:.8em;">Demo: puedes crear una cuenta nueva o usar cualquier correo registrado previamente en esta sesión.</p>
+      <p class="help" style="text-align:center;margin-bottom:0;margin-top:.8em;">Tus datos se guardan en Firebase, así que puedes entrar desde cualquier dispositivo con el mismo correo.</p>
     </div>
   </div>
 </section>
@@ -665,7 +696,9 @@ input, select, textarea{ font-size:16px; }
         <input id="c-contacto-tel" type="tel" required placeholder="300 000 0000">
       </fieldset>
 
-      <button type="submit" class="btn btn-primary btn-block">Crear cuenta y continuar</button>
+      <div id="register-banner"></div>
+
+      <button type="submit" class="btn btn-primary btn-block" id="btn-register">Crear cuenta y continuar</button>
     </form>
   </div>
 </section>
@@ -726,7 +759,7 @@ input, select, textarea{ font-size:16px; }
   <button class="emergency-fab" onclick="triggerEmergency()" aria-label="Botón de emergencia">🆘<br>SOS</button>
   <nav class="bottom-nav" aria-label="Navegación principal">
     <button aria-current="page" onclick="goTo('screen-client-home')">🏠<span>Inicio</span></button>
-    <button onclick="renderTripHistory();goTo('screen-history')">🕒<span>Historial</span></button>
+    <button onclick="goTo('screen-history')">🕒<span>Historial</span></button>
     <button onclick="goTo('screen-profile')">👤<span>Perfil</span></button>
   </nav>
 </section>
@@ -912,48 +945,17 @@ input, select, textarea{ font-size:16px; }
 
 <script>
 /* ==============================================================================
-   ACCESSRIDE COLOMBIA — PROTOTYPE LOGIC
+   ACCESSRIDE COLOMBIA — LÓGICA PRINCIPAL (Firebase Auth + Cloud Firestore)
    ============================================================================== */
 
-/* ---------- Theme & Accessibility Settings ---------- */
-function initTheme(){
-  const saved = localStorage.getItem('accessride-theme');
-  const theme = saved || 'light';
-  document.documentElement.setAttribute('data-theme', theme);
-  updateThemeUI(theme);
-
-  const savedContrast = localStorage.getItem('accessride-contrast') === 'high';
-  setContrast(savedContrast, true);
-}
-function toggleTheme(){
-  const current = document.documentElement.getAttribute('data-theme') || 'light';
-  setTheme(current === 'light' ? 'dark' : 'light');
-}
-function setTheme(next){
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('accessride-theme', next);
-  updateThemeUI(next);
-  announce(next === 'dark' ? 'Modo oscuro activado' : 'Modo claro activado');
-}
-function updateThemeUI(theme){
-  const icon = document.getElementById('theme-icon');
-  const label = document.getElementById('theme-label');
-  if(icon) icon.textContent = theme === 'dark' ? '☀️' : '🌙';
-  if(label) label.textContent = theme === 'dark' ? 'Modo claro' : 'Modo oscuro';
-  const settingsToggle = document.getElementById('settings-theme-toggle');
-  if(settingsToggle) settingsToggle.checked = (theme === 'dark');
-}
-function setContrast(enabled, silent){
-  document.documentElement.setAttribute('data-contrast', enabled ? 'high' : 'normal');
-  localStorage.setItem('accessride-contrast', enabled ? 'high' : 'normal');
-  const contrastToggle = document.getElementById('settings-contrast-toggle');
-  if(contrastToggle) contrastToggle.checked = enabled;
-  if(!silent) announce(enabled ? 'Alto contraste activado' : 'Alto contraste desactivado');
-}
+/* ---------- Referencias a Firestore ---------- */
+const USERS_COLLECTION = "usuarios";
+const TRIPS_SUBCOLLECTION = "viajes";
+const serverTimestamp = () => firebase.firestore.FieldValue.serverTimestamp();
 
 /* ---------- State ---------- */
-const DB = { clients:{} };
-let session = null;
+let session = null;          // {uid, email}
+let currentProfile = null;   // documento de usuarios/{uid}
 let userLatLng = null;
 let userAddress = "";
 let map, trackMap;
@@ -963,7 +965,8 @@ let tapMode = null;
 let currentTrip = null;
 let activeRide = null;
 let trackTimer = null;
-let tripHistory = [];
+let tripHistory = [];        // caché en memoria de la subcolección "viajes"
+let authRestoreDone = false; // evita que onAuthStateChanged interrumpa un flujo en curso
 
 const COLOMBIA_BOUNDS = { minLat:-4.3, maxLat:13.5, minLng:-79.1, maxLng:-66.8 };
 const BOGOTA = { lat:4.7110, lng:-74.0721, address:"Carrera 7 # 72-41, Bogotá D.C." };
@@ -988,6 +991,66 @@ const ADAPTATION_LABELS = {
   fijacion:"Fijación de silla", ayuda:"Ayuda al abordar", visual:"Apoyo visual", auditiva:"Apoyo auditivo"
 };
 
+/* ---------- Theme & Accessibility Settings ---------- */
+/* Las preferencias visuales se aplican al instante y, si hay sesión activa,
+   quedan guardadas en el documento del usuario en Firestore. */
+function initTheme(){
+  const saved = localStorage.getItem('accessride-theme');
+  const theme = saved || 'light';
+  applyTheme(theme);
+  const savedContrast = localStorage.getItem('accessride-contrast') === 'high';
+  applyContrast(savedContrast);
+}
+function toggleTheme(){
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  setTheme(current === 'light' ? 'dark' : 'light');
+}
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('accessride-theme', theme);
+  updateThemeUI(theme);
+}
+function setTheme(next){
+  applyTheme(next);
+  announce(next === 'dark' ? 'Modo oscuro activado' : 'Modo claro activado');
+  savePreferences();
+}
+function updateThemeUI(theme){
+  const icon = document.getElementById('theme-icon');
+  const label = document.getElementById('theme-label');
+  if(icon) icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+  if(label) label.textContent = theme === 'dark' ? 'Modo claro' : 'Modo oscuro';
+  const settingsToggle = document.getElementById('settings-theme-toggle');
+  if(settingsToggle) settingsToggle.checked = (theme === 'dark');
+}
+function applyContrast(enabled){
+  document.documentElement.setAttribute('data-contrast', enabled ? 'high' : 'normal');
+  localStorage.setItem('accessride-contrast', enabled ? 'high' : 'normal');
+  const contrastToggle = document.getElementById('settings-contrast-toggle');
+  if(contrastToggle) contrastToggle.checked = enabled;
+}
+function setContrast(enabled, silent){
+  applyContrast(enabled);
+  if(!silent) announce(enabled ? 'Alto contraste activado' : 'Alto contraste desactivado');
+  savePreferences();
+}
+function savePreferences(){
+  if(!session || !session.uid) return;
+  const prefs = {
+    tema: document.documentElement.getAttribute('data-theme') || 'light',
+    contraste: document.documentElement.getAttribute('data-contrast') || 'normal'
+  };
+  if(currentProfile) currentProfile.preferencias = prefs;
+  db.collection(USERS_COLLECTION).doc(session.uid)
+    .set({preferencias: prefs, actualizadoEn: serverTimestamp()}, {merge:true})
+    .catch(err=>console.warn('No se pudieron guardar las preferencias:', err));
+}
+function applyProfilePreferences(profile){
+  if(!profile || !profile.preferencias) return;
+  if(profile.preferencias.tema) applyTheme(profile.preferencias.tema);
+  applyContrast(profile.preferencias.contraste === 'high');
+}
+
 /* ---------- Navigation ---------- */
 function goTo(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -995,6 +1058,8 @@ function goTo(id){
   announce("Sección: " + (document.querySelector('#'+id+' h1, #'+id+' h2')?.textContent || id));
   window.scrollTo(0,0);
   if(id==='screen-client-home'){ setTimeout(initClientMap, 60); }
+  if(id==='screen-profile') fillProfile();
+  if(id==='screen-history') renderTripHistory();
 }
 function announce(msg){ document.getElementById('live-region').textContent = msg; }
 function blobatarUrl(name){ return `https://blobatar.dev/avatar/${encodeURIComponent(name||'')}?background=circle`; }
@@ -1008,8 +1073,50 @@ document.addEventListener('keydown', (e)=>{
   }
 });
 
+/* ---------- Estados de carga en botones ---------- */
+function setButtonLoading(btn, loading, loadingText){
+  if(!btn) return;
+  if(loading){
+    btn.dataset.originalText = btn.dataset.originalText || btn.textContent;
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner" aria-hidden="true"></span>${loadingText || 'Procesando…'}`;
+  } else {
+    btn.disabled = false;
+    btn.textContent = btn.dataset.originalText || btn.textContent;
+  }
+}
+function showBanner(containerId, message, ok){
+  const box = document.getElementById(containerId);
+  if(!box) return;
+  box.innerHTML = `<div class="banner ${ok?'banner-ok':'banner-error'}" style="border-radius:10px;margin-bottom:1em;">${escapeHtml(message)}</div>`;
+  announce(message);
+}
+function clearBanner(containerId){
+  const box = document.getElementById(containerId);
+  if(box) box.innerHTML = '';
+}
+
+/* ---------- Traducción de errores de Firebase ---------- */
+function firebaseErrorMessage(err){
+  const code = (err && err.code) || '';
+  const map = {
+    'auth/email-already-in-use':'Ese correo ya tiene una cuenta. Inicia sesión o usa otro correo.',
+    'auth/invalid-email':'El correo no tiene un formato válido.',
+    'auth/weak-password':'La contraseña debe tener al menos 6 caracteres.',
+    'auth/user-not-found':'No encontramos una cuenta con ese correo. Crea una cuenta nueva.',
+    'auth/wrong-password':'La contraseña no es correcta. Inténtalo de nuevo.',
+    'auth/invalid-credential':'Correo o contraseña incorrectos. Inténtalo de nuevo.',
+    'auth/too-many-requests':'Demasiados intentos seguidos. Espera un momento y vuelve a intentarlo.',
+    'auth/network-request-failed':'No hay conexión con el servidor. Revisa tu internet.',
+    'auth/operation-not-allowed':'El acceso con correo y contraseña está desactivado en Firebase. Actívalo en Authentication → Sign-in method.',
+    'permission-denied':'Las reglas de seguridad de Firestore bloquearon la operación.',
+    'unavailable':'Firestore no está disponible en este momento. Inténtalo de nuevo.'
+  };
+  return map[code] || (err && err.message) || 'Ocurrió un error inesperado.';
+}
+
 /* ---------- Profile photo (registration preview) ---------- */
-let pendingProfilePhoto = null; // dataURL of uploaded photo, or null to use blobatar
+let pendingProfilePhoto = null; // dataURL comprimido, se guarda en Firestore
 function updateAvatarPreview(){
   const preview = document.getElementById('c-avatar-preview');
   if(!preview) return;
@@ -1020,18 +1127,39 @@ function updateAvatarPreview(){
     preview.innerHTML = avatarImg(nombre || 'Usuario');
   }
 }
-function onProfilePhotoChange(e){
+/* Firestore limita cada documento a 1 MB, así que la foto se reduce antes de guardarla. */
+function resizeImageToDataURL(file, maxSize){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onerror = ()=>reject(new Error('No se pudo leer la imagen'));
+    reader.onload = ()=>{
+      const img = new Image();
+      img.onerror = ()=>reject(new Error('Formato de imagen no compatible'));
+      img.onload = ()=>{
+        const scale = Math.min(1, maxSize/Math.max(img.width, img.height));
+        const w = Math.round(img.width*scale), h = Math.round(img.height*scale);
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.82));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+async function onProfilePhotoChange(e){
   const file = e.target.files && e.target.files[0];
   if(!file) return;
-  const reader = new FileReader();
-  reader.onload = ()=>{
-    pendingProfilePhoto = reader.result;
+  try{
+    pendingProfilePhoto = await resizeImageToDataURL(file, 320);
     updateAvatarPreview();
     const removeBtn = document.getElementById('c-foto-remove-btn');
     if(removeBtn) removeBtn.style.display = 'inline-flex';
     announce("Foto de perfil actualizada");
-  };
-  reader.readAsDataURL(file);
+  }catch(err){
+    showBanner('register-banner', 'No pudimos procesar esa imagen. Prueba con otra foto.');
+  }
 }
 function removeProfilePhoto(){
   pendingProfilePhoto = null;
@@ -1043,81 +1171,200 @@ function removeProfilePhoto(){
   announce("Foto de perfil eliminada, se usará el avatar generado");
 }
 
-/* ---------- Auth ---------- */
-function handleRegisterClient(e){
+/* ==============================================================================
+   AUTENTICACIÓN (Firebase Auth) + PERFIL (Cloud Firestore)
+   ============================================================================== */
+
+async function handleRegisterClient(e){
   e.preventDefault();
+  clearBanner('register-banner');
+  const btn = document.getElementById('btn-register');
   const email = document.getElementById('c-correo').value.trim().toLowerCase();
-  const client = {
-    nombre: document.getElementById('c-nombre').value,
-    doc: document.getElementById('c-doc').value,
-    nacimiento: document.getElementById('c-nac').value,
-    telefono: document.getElementById('c-tel').value,
-    correo: email,
-    pass: document.getElementById('c-pass').value,
-    foto: pendingProfilePhoto,
-    tipo: document.getElementById('c-tipo').value,
-    espacioSilla: document.getElementById('c-espacio').checked,
-    ayudaAbordar: document.getElementById('c-ayuda').checked,
-    mascota: document.getElementById('c-mascota').checked,
-    tipoMascota: document.getElementById('c-tipo-mascota').value,
-    observaciones: document.getElementById('c-obs').value,
-    contactoNombre: document.getElementById('c-contacto-nombre').value,
-    contactoRelacion: document.getElementById('c-contacto-relacion').value,
-    contactoTelefono: document.getElementById('c-contacto-tel').value
-  };
-  DB.clients[email] = client;
-  session = {type:'client', email};
-  pendingProfilePhoto = null;
-  announce("Cuenta creada. Bienvenido "+client.nombre);
-  goTo('screen-location');
-  return false;
-}
+  const password = document.getElementById('c-pass').value;
 
-function handleLogin(e){
-  e.preventDefault();
-  const email = document.getElementById('login-email').value.trim().toLowerCase();
-  const pass = document.getElementById('login-pass').value;
-  const banner = document.getElementById('login-banner');
-  if(DB.clients[email] && DB.clients[email].pass===pass){
-    session = {type:'client', email};
+  setButtonLoading(btn, true, 'Creando tu cuenta…');
+  try{
+    const cred = await auth.createUserWithEmailAndPassword(email, password);
+    const user = cred.user;
+
+    const perfil = {
+      uid: user.uid,
+      nombre: document.getElementById('c-nombre').value.trim(),
+      doc: document.getElementById('c-doc').value.trim(),
+      nacimiento: document.getElementById('c-nac').value,
+      telefono: document.getElementById('c-tel').value.trim(),
+      correo: email,
+      foto: pendingProfilePhoto || null,
+      tipo: document.getElementById('c-tipo').value,
+      espacioSilla: document.getElementById('c-espacio').checked,
+      ayudaAbordar: document.getElementById('c-ayuda').checked,
+      mascota: document.getElementById('c-mascota').checked,
+      tipoMascota: document.getElementById('c-tipo-mascota').value.trim(),
+      observaciones: document.getElementById('c-obs').value.trim(),
+      contactoNombre: document.getElementById('c-contacto-nombre').value.trim(),
+      contactoRelacion: document.getElementById('c-contacto-relacion').value.trim(),
+      contactoTelefono: document.getElementById('c-contacto-tel').value.trim(),
+      esDemo: false,
+      preferencias: {
+        tema: document.documentElement.getAttribute('data-theme') || 'light',
+        contraste: document.documentElement.getAttribute('data-contrast') || 'normal'
+      },
+      creadoEn: serverTimestamp(),
+      actualizadoEn: serverTimestamp()
+    };
+
+    await db.collection(USERS_COLLECTION).doc(user.uid).set(perfil);
+    await user.updateProfile({displayName: perfil.nombre}).catch(()=>{});
+
+    session = {uid:user.uid, email};
+    currentProfile = perfil;
+    authRestoreDone = true;
+    tripHistory = [];
+    pendingProfilePhoto = null;
+    document.getElementById('form-client').reset();
+    updateAvatarPreview();
+
+    announce("Cuenta creada. Bienvenido " + perfil.nombre);
     goTo('screen-location');
-    return false;
+  }catch(err){
+    console.error(err);
+    showBanner('register-banner', firebaseErrorMessage(err));
+  }finally{
+    setButtonLoading(btn, false);
   }
-  banner.innerHTML = '<div class="banner banner-error" style="border-radius:10px;">Correo o contraseña incorrectos. Si es tu primera vez, crea una cuenta.</div>';
   return false;
 }
 
-function handleDemoLogin(){
-  const n = Math.floor(Math.random()*10000);
-  const email = "prueba"+n+"@demo.accessride.co";
-  const client = {
-    nombre: "Usuario de Prueba",
-    doc: "0000"+n,
-    nacimiento: "1990-01-01",
-    telefono: "300 000 "+String(n).padStart(4,'0'),
-    correo: email,
-    pass: "demo123",
-    tipo: "movilidad_reducida",
-    espacioSilla: true,
-    ayudaAbordar: false,
-    mascota: false,
-    tipoMascota: "",
-    observaciones: "Cuenta de prueba generada automáticamente para explorar la aplicación.",
-    contactoNombre: "Contacto de Prueba",
-    contactoTelefono: "300 000 0000"
-  };
-  DB.clients[email] = client;
-  session = {type:'client', email};
-  announce("Ingresaste con una cuenta de prueba");
-  goTo('screen-location');
+async function handleLogin(e){
+  e.preventDefault();
+  clearBanner('login-banner');
+  const btn = document.getElementById('btn-login');
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const password = document.getElementById('login-pass').value;
+
+  setButtonLoading(btn, true, 'Entrando…');
+  try{
+    const cred = await auth.signInWithEmailAndPassword(email, password);
+    await loadProfile(cred.user);
+    authRestoreDone = true;
+    document.getElementById('login-pass').value = '';
+    goTo('screen-location');
+  }catch(err){
+    console.error(err);
+    showBanner('login-banner', firebaseErrorMessage(err));
+  }finally{
+    setButtonLoading(btn, false);
+  }
+  return false;
 }
 
-function handleLogout(){
-  session = null;
-  activeRide = null;
+async function handleDemoLogin(){
+  const btn = document.getElementById('btn-demo-login');
+  clearBanner('login-banner');
+  setButtonLoading(btn, true, 'Creando cuenta de prueba…');
+  const n = Math.floor(Math.random()*100000);
+  const email = "prueba" + n + "-" + Date.now() + "@demo.accessride.co";
+  const password = "demo123456";
+  try{
+    const cred = await auth.createUserWithEmailAndPassword(email, password);
+    const perfil = {
+      uid: cred.user.uid,
+      nombre: "Usuario de Prueba",
+      doc: "0000" + n,
+      nacimiento: "1990-01-01",
+      telefono: "300 000 " + String(n).padStart(4,'0').slice(-4),
+      correo: email,
+      foto: null,
+      tipo: "movilidad_reducida",
+      espacioSilla: true,
+      ayudaAbordar: false,
+      mascota: false,
+      tipoMascota: "",
+      observaciones: "Cuenta de prueba generada automáticamente para explorar la aplicación.",
+      contactoNombre: "Contacto de Prueba",
+      contactoRelacion: "Familiar",
+      contactoTelefono: "300 000 0000",
+      esDemo: true,
+      preferencias: {
+        tema: document.documentElement.getAttribute('data-theme') || 'light',
+        contraste: document.documentElement.getAttribute('data-contrast') || 'normal'
+      },
+      creadoEn: serverTimestamp(),
+      actualizadoEn: serverTimestamp()
+    };
+    await db.collection(USERS_COLLECTION).doc(cred.user.uid).set(perfil);
+    session = {uid:cred.user.uid, email};
+    currentProfile = perfil;
+    authRestoreDone = true;
+    tripHistory = [];
+    announce("Ingresaste con una cuenta de prueba");
+    goTo('screen-location');
+  }catch(err){
+    console.error(err);
+    showBanner('login-banner', firebaseErrorMessage(err));
+  }finally{
+    setButtonLoading(btn, false);
+  }
+}
+
+/* Lee usuarios/{uid}. Si el documento no existe (cuenta creada fuera del
+   formulario), crea uno mínimo para que la app siempre tenga perfil. */
+async function loadProfile(user){
+  const ref = db.collection(USERS_COLLECTION).doc(user.uid);
+  const snap = await ref.get();
+  if(snap.exists){
+    currentProfile = snap.data();
+  }else{
+    currentProfile = {
+      uid: user.uid,
+      nombre: user.displayName || (user.email||'').split('@')[0],
+      doc: "", nacimiento: "", telefono: "",
+      correo: user.email || "",
+      foto: null,
+      tipo: "otra",
+      espacioSilla:false, ayudaAbordar:false, mascota:false, tipoMascota:"",
+      observaciones:"",
+      contactoNombre:"", contactoRelacion:"", contactoTelefono:"",
+      esDemo:false,
+      creadoEn: serverTimestamp(),
+      actualizadoEn: serverTimestamp()
+    };
+    await ref.set(currentProfile);
+  }
+  session = {uid:user.uid, email:user.email};
+  applyProfilePreferences(currentProfile);
+  await loadTripHistory();
+  return currentProfile;
+}
+
+async function handleLogout(){
   if(trackTimer) clearInterval(trackTimer);
+  activeRide = null;
+  currentTrip = null;
+  tripHistory = [];
+  currentProfile = null;
+  session = null;
+  authRestoreDone = true;
+  try{ await auth.signOut(); }catch(err){ console.warn(err); }
   goTo('screen-landing');
 }
+
+/* Restaura la sesión al recargar la página. */
+auth.onAuthStateChanged(async (user)=>{
+  if(authRestoreDone) return;
+  authRestoreDone = true;
+  if(!user) return;
+  try{
+    await loadProfile(user);
+    const activeScreen = document.querySelector('.screen.active');
+    if(!activeScreen || ['screen-landing','screen-login','screen-register-client'].includes(activeScreen.id)){
+      announce('Sesión restaurada');
+      goTo('screen-location');
+    }
+  }catch(err){
+    console.error('No se pudo restaurar la sesión:', err);
+  }
+});
 
 /* ---------- Geolocation ---------- */
 function requestLocation(){
@@ -1154,6 +1401,12 @@ function isInsideColombia(lat,lng){
 
 function setUserLocation(lat,lng){
   userLatLng = {lat,lng};
+  /* Guarda la última ubicación conocida en el perfil del usuario. */
+  if(session && session.uid){
+    db.collection(USERS_COLLECTION).doc(session.uid).set({
+      ultimaUbicacion: {lat, lng, registradaEn: serverTimestamp()}
+    }, {merge:true}).catch(err=>console.warn('No se guardó la ubicación:', err));
+  }
 }
 
 function reverseGeocode(lat,lng){
@@ -1177,6 +1430,7 @@ function enterApp(){
 
 /* ---------- Map (client) ---------- */
 function initClientMap(){
+  if(!userLatLng) return;
   const el = document.getElementById('current-address');
   el.textContent = userAddress || "Detectando dirección…";
   if(!userAddress) reverseGeocode(userLatLng.lat, userLatLng.lng);
@@ -1189,6 +1443,7 @@ function initClientMap(){
     map.on('click', onMapClick);
   } else {
     map.setView([userLatLng.lat, userLatLng.lng], 14);
+    map.invalidateSize();
   }
 
   if(userMarker) map.removeLayer(userMarker);
@@ -1554,7 +1809,12 @@ async function calculateTrip(){
   const timeMin = route.timeMin;
   const fare = calcFare(distanceKm);
 
-  currentTrip = { pickup, dest, distanceKm, fare, timeMin, routeCoords: route.coords, routeIsReal: route.real };
+  currentTrip = {
+    pickup, dest, distanceKm, fare, timeMin,
+    routeCoords: route.coords,
+    routeIsReal: route.real,
+    destAddress: document.getElementById('dest-address').value.trim()
+  };
 
   document.getElementById('fare-amount').textContent = formatCOP(fare);
   document.getElementById('fare-distance').textContent = distanceKm.toFixed(1)+" km";
@@ -1567,7 +1827,7 @@ async function calculateTrip(){
 
   drawRoutePreview(pickup, dest, route.coords);
 
-  const client = DB.clients[session.email];
+  const client = currentProfile || {};
   const ranked = rankDrivers(client, generatedDrivers);
   const [best, ...rest] = ranked;
   document.getElementById('recommended-driver-box').innerHTML = best ? driverCardHTML(best, true, best.reasons) : '<p class="help">No encontramos conductores compatibles cerca. Intenta de nuevo en unos minutos.</p>';
@@ -1721,19 +1981,62 @@ async function setupTracking(){
 
 function lerp(a,b,t){ return a+(b-a)*t; }
 
-function finishTrip(){
-  tripHistory.unshift({
+/* ==============================================================================
+   HISTORIAL DE VIAJES — usuarios/{uid}/viajes
+   ============================================================================== */
+async function finishTrip(){
+  if(!activeRide) return;
+  const viaje = {
     fecha: new Date().toLocaleString('es-CO'),
     conductor: activeRide.driver.name,
-    distancia: activeRide.distanceKm.toFixed(1),
+    vehiculo: activeRide.driver.vehicle,
+    placa: activeRide.driver.plate,
+    distancia: Number(activeRide.distanceKm.toFixed(1)),
+    duracionMin: activeRide.timeMin,
     tarifa: activeRide.fare,
-    origen: userAddress,
-  });
+    origen: userAddress || '',
+    destino: activeRide.destAddress || '',
+    coordenadas: {
+      origen: {lat: activeRide.pickup.lat, lng: activeRide.pickup.lng},
+      destino: {lat: activeRide.dest.lat, lng: activeRide.dest.lng}
+    },
+    estado: 'completado'
+  };
+
+  tripHistory.unshift(viaje); // se muestra de inmediato mientras Firestore confirma
   announce("Viaje finalizado. Llegaste a tu destino.");
+
+  if(!session || !session.uid) return;
+  try{
+    await db.collection(USERS_COLLECTION).doc(session.uid)
+      .collection(TRIPS_SUBCOLLECTION)
+      .add({...viaje, creadoEn: serverTimestamp()});
+  }catch(err){
+    console.error('No se pudo guardar el viaje en Firestore:', err);
+  }
 }
 
-function renderTripHistory(){
+async function loadTripHistory(){
+  if(!session || !session.uid){ tripHistory = []; return tripHistory; }
+  const snap = await db.collection(USERS_COLLECTION).doc(session.uid)
+    .collection(TRIPS_SUBCOLLECTION)
+    .orderBy('creadoEn','desc')
+    .limit(50)
+    .get();
+  tripHistory = snap.docs.map(d=>({id:d.id, ...d.data()}));
+  return tripHistory;
+}
+
+async function renderTripHistory(){
   const box = document.getElementById('history-container');
+  box.innerHTML = '<h2>Historial de viajes</h2><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div>';
+  try{
+    await loadTripHistory();
+  }catch(err){
+    console.error(err);
+    box.innerHTML = `<h2>Historial de viajes</h2><div class="banner banner-error" style="border-radius:10px;">${escapeHtml(firebaseErrorMessage(err))}</div>`;
+    return;
+  }
   if(!tripHistory.length){
     box.innerHTML = `<div class="empty-state">🕒<p>Aún no tienes viajes en tu historial.</p></div>`;
     return;
@@ -1741,77 +2044,104 @@ function renderTripHistory(){
   box.innerHTML = '<h2>Historial de viajes</h2>' + tripHistory.map(t=>`
     <div class="card" style="margin-bottom:.8em;">
       <div style="display:flex;justify-content:space-between;">
-        <strong>${t.conductor}</strong><span>${formatCOP(t.tarifa)}</span>
+        <strong>${escapeHtml(t.conductor||'')}</strong><span>${formatCOP(t.tarifa||0)}</span>
       </div>
-      <div class="help" style="margin:.2em 0 0;">${t.fecha} · ${t.distancia} km</div>
+      <div class="help" style="margin:.2em 0 0;">${escapeHtml(t.fecha||'')} · ${t.distancia||0} km</div>
     </div>`).join('');
 }
 
 /* ---------- Profile ---------- */
 function fillProfile(){
   const box = document.getElementById('profile-container');
-  if(!session) return;
-  if(session.type==='client'){
-    const c = DB.clients[session.email];
-    box.innerHTML = `
-      <div class="card" style="text-align:center; margin-bottom:1.2em;">
-        <div class="driver-avatar" style="width:72px;height:72px;font-size:1.6rem;margin:0 auto .6em;">${avatarImg(c.nombre, c.foto)}</div>
-        <h2 style="margin-bottom:.2em;">${c.nombre}</h2>
-        <span class="pill pill-teal">${labelTipo(c.tipo)}</span>
-      </div>
-      <div class="card" style="margin-bottom:.8em;">
-        <h3 style="margin-bottom:.6em;">Información personal</h3>
-        <p><strong>Documento:</strong> ${c.doc}</p>
-        <p><strong>Teléfono:</strong> ${c.telefono}</p>
-        <p><strong>Correo:</strong> ${c.correo}</p>
-      </div>
-      <div class="card" style="margin-bottom:.8em;">
-        <h3 style="margin-bottom:.6em;">Necesidades de accesibilidad</h3>
-        <p><strong>Espacio para silla:</strong> ${c.espacioSilla?'Sí':'No'}</p>
-        <p><strong>Ayuda al abordar:</strong> ${c.ayudaAbordar?'Sí':'No'}</p>
-        <p><strong>Animal de compañía:</strong> ${c.mascota?('Sí — '+(c.tipoMascota||'')):'No'}</p>
-        <p><strong>Observaciones:</strong> ${c.observaciones||'—'}</p>
-      </div>
-      <div class="card">
-        <h3 style="margin-bottom:.6em;">Contacto de emergencia</h3>
-        <p class="help" style="margin-top:-.3em;">Esta persona será notificada si activas el botón SOS.</p>
-        <label for="trusted-name">Nombre</label>
-        <input id="trusted-name" type="text" placeholder="Nombre del contacto" value="${c.contactoNombre||''}">
-        <label for="trusted-relacion">Relación</label>
-        <input id="trusted-relacion" type="text" placeholder="Ej: Madre, hermano, amigo/a" value="${c.contactoRelacion||''}">
-        <label for="trusted-phone">Teléfono</label>
-        <input id="trusted-phone" type="tel" placeholder="300 000 0000" value="${c.contactoTelefono||''}">
-        <button class="btn btn-outline btn-block" style="margin-top:1em;" onclick="saveTrustedContact()">Guardar contacto</button>
-      </div>
-    `;
+  if(!session || !currentProfile){
+    box.innerHTML = `<div class="empty-state">👤<p>Inicia sesión para ver tu perfil.</p></div>`;
+    return;
   }
+  const c = currentProfile;
+  box.innerHTML = `
+    <div class="card" style="text-align:center; margin-bottom:1.2em;">
+      <div class="driver-avatar" style="width:72px;height:72px;font-size:1.6rem;margin:0 auto .6em;">${avatarImg(c.nombre, c.foto)}</div>
+      <h2 style="margin-bottom:.2em;">${escapeHtml(c.nombre||'')}</h2>
+      <span class="pill pill-teal">${labelTipo(c.tipo)}</span>
+    </div>
+    <div class="card" style="margin-bottom:.8em;">
+      <h3 style="margin-bottom:.6em;">Información personal</h3>
+      <p><strong>Documento:</strong> ${escapeHtml(c.doc||'—')}</p>
+      <p><strong>Teléfono:</strong> ${escapeHtml(c.telefono||'—')}</p>
+      <p><strong>Correo:</strong> ${escapeHtml(c.correo||'—')}</p>
+    </div>
+    <div class="card" style="margin-bottom:.8em;">
+      <h3 style="margin-bottom:.6em;">Necesidades de accesibilidad</h3>
+      <p><strong>Espacio para silla:</strong> ${c.espacioSilla?'Sí':'No'}</p>
+      <p><strong>Ayuda al abordar:</strong> ${c.ayudaAbordar?'Sí':'No'}</p>
+      <p><strong>Animal de compañía:</strong> ${c.mascota?('Sí — '+escapeHtml(c.tipoMascota||'')):'No'}</p>
+      <p><strong>Observaciones:</strong> ${escapeHtml(c.observaciones||'—')}</p>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:.6em;">Contacto de emergencia</h3>
+      <p class="help" style="margin-top:-.3em;">Esta persona será notificada si activas el botón SOS.</p>
+      <div id="trusted-banner"></div>
+      <label for="trusted-name">Nombre</label>
+      <input id="trusted-name" type="text" placeholder="Nombre del contacto" value="${escapeHtml(c.contactoNombre||'')}">
+      <label for="trusted-relacion">Relación</label>
+      <input id="trusted-relacion" type="text" placeholder="Ej: Madre, hermano, amigo/a" value="${escapeHtml(c.contactoRelacion||'')}">
+      <label for="trusted-phone">Teléfono</label>
+      <input id="trusted-phone" type="tel" placeholder="300 000 0000" value="${escapeHtml(c.contactoTelefono||'')}">
+      <button class="btn btn-outline btn-block" id="btn-save-trusted" style="margin-top:1em;" onclick="saveTrustedContact()">Guardar contacto</button>
+    </div>
+  `;
 }
 function labelTipo(t){
   const map = {silla_manual:"Silla de ruedas manual", silla_electrica:"Silla de ruedas eléctrica", movilidad_reducida:"Movilidad reducida", visual:"Discapacidad visual", auditiva:"Discapacidad auditiva", cognitiva:"Discapacidad cognitiva", otra:"Otra necesidad"};
   return map[t]||"—";
 }
 
-const _goTo = goTo;
-goTo = function(id){
-  _goTo(id);
-  if(id==='screen-profile') fillProfile();
-};
-
 /* ---------- Emergency ---------- */
-function triggerEmergency(){ openModal('modal-emergency'); announce("Alerta de emergencia activada"); }
-function callTrustedContact(){ announce("Llamando a tu contacto de confianza (simulado)"); alert("Llamando a tu contacto de confianza…"); }
-function saveTrustedContact(){
-  if(!session || session.type!=='client') return;
-  const c = DB.clients[session.email];
-  c.contactoNombre = document.getElementById('trusted-name').value;
-  c.contactoRelacion = document.getElementById('trusted-relacion').value;
-  c.contactoTelefono = document.getElementById('trusted-phone').value;
-  announce('Contacto de emergencia guardado');
+function triggerEmergency(){
+  openModal('modal-emergency');
+  announce("Alerta de emergencia activada");
+  /* Deja constancia de la alerta en Firestore para el panel de soporte. */
+  if(session && session.uid){
+    db.collection(USERS_COLLECTION).doc(session.uid).collection('alertas').add({
+      tipo: 'sos',
+      ubicacion: userLatLng ? {lat:userLatLng.lat, lng:userLatLng.lng} : null,
+      direccion: userAddress || '',
+      conductor: activeRide ? activeRide.driver.name : null,
+      creadoEn: serverTimestamp()
+    }).catch(err=>console.warn('No se registró la alerta:', err));
+  }
+}
+function callTrustedContact(){
+  const tel = currentProfile && currentProfile.contactoTelefono;
+  announce("Llamando a tu contacto de confianza (simulado)");
+  alert("Llamando a tu contacto de confianza" + (tel ? " ("+tel+")" : "") + "…");
+}
+async function saveTrustedContact(){
+  if(!session || !session.uid) return;
+  const btn = document.getElementById('btn-save-trusted');
+  const datos = {
+    contactoNombre: document.getElementById('trusted-name').value.trim(),
+    contactoRelacion: document.getElementById('trusted-relacion').value.trim(),
+    contactoTelefono: document.getElementById('trusted-phone').value.trim(),
+    actualizadoEn: serverTimestamp()
+  };
+  setButtonLoading(btn, true, 'Guardando…');
+  try{
+    await db.collection(USERS_COLLECTION).doc(session.uid).set(datos, {merge:true});
+    currentProfile = {...currentProfile, ...datos};
+    showBanner('trusted-banner', 'Contacto de emergencia guardado', true);
+  }catch(err){
+    console.error(err);
+    showBanner('trusted-banner', firebaseErrorMessage(err));
+  }finally{
+    setButtonLoading(btn, false);
+  }
 }
 
 /* ---------- Init ---------- */
 document.addEventListener('DOMContentLoaded', ()=>{
   initTheme();
+  updateAvatarPreview();
 });
 </script>
 </body>
