@@ -616,6 +616,27 @@ kbd{
 [data-cvd]:not([data-cvd="off"]) .state-enroute{ background:color-mix(in srgb, var(--accent-primary) 12%, transparent); color:var(--accent-primary); border-color:color-mix(in srgb, var(--accent-primary) 30%, transparent); }
 [data-cvd]:not([data-cvd="off"]) .address-bar .dot{ background:var(--accent-success); box-shadow:0 0 0 4px color-mix(in srgb, var(--accent-success) 22%, transparent); }
 
+/* Filtro de pantalla completa: un overlay invisible a los clics que aplica
+   un ajuste de color sobre TODO lo que se ha pintado detrás (mapa, emojis,
+   degradados, modales…), igual que los "filtros de color" del sistema en
+   iOS/Android. No se usa un filter en <html>/<body> porque eso rompería el
+   posicionamiento de todos los elementos position:fixed de la app. */
+#a11y-cvd-overlay{
+  position:fixed; inset:0; z-index:6000; pointer-events:none; opacity:0;
+}
+[data-cvd="deuteranopia"] #a11y-cvd-overlay{
+  opacity:1; backdrop-filter:saturate(1.6) contrast(1.05) hue-rotate(8deg);
+  -webkit-backdrop-filter:saturate(1.6) contrast(1.05) hue-rotate(8deg);
+}
+[data-cvd="protanopia"] #a11y-cvd-overlay{
+  opacity:1; backdrop-filter:saturate(1.6) contrast(1.05) hue-rotate(-8deg);
+  -webkit-backdrop-filter:saturate(1.6) contrast(1.05) hue-rotate(-8deg);
+}
+[data-cvd="tritanopia"] #a11y-cvd-overlay{
+  opacity:1; backdrop-filter:saturate(1.5) contrast(1.1) hue-rotate(28deg);
+  -webkit-backdrop-filter:saturate(1.5) contrast(1.1) hue-rotate(28deg);
+}
+
 /* Nunca depender solo del color: refuerzo con símbolo + forma */
 .banner-ok::before{ content:"✓ "; font-weight:900; }
 .banner-error::before{ content:"⚠ "; font-weight:900; }
@@ -641,7 +662,7 @@ kbd{
 #a11y-flash.on{ opacity:.42; }
 #a11y-toasts{
   position:fixed; left:50%; transform:translateX(-50%);
-  bottom:calc(84px + env(safe-area-inset-bottom)); z-index:1500;
+  top:calc(76px + env(safe-area-inset-top)); z-index:1500;
   display:flex; flex-direction:column; gap:.5em; width:min(540px, 92vw); pointer-events:none;
 }
 .a11y-toast{
@@ -653,7 +674,7 @@ kbd{
 .a11y-toast.alert{ border-color:var(--accent-danger); }
 .a11y-toast.ok{ border-color:var(--accent-success); }
 .a11y-toast .ico{ font-size:1.4rem; flex:none; }
-@keyframes toastIn{ from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);} }
+@keyframes toastIn{ from{opacity:0; transform:translateY(-14px);} to{opacity:1; transform:translateY(0);} }
 
 /* ---------- 7. CONTROL POR VOZ ---------- */
 .voice-fab{
@@ -721,6 +742,34 @@ kbd{
 #a11y-font-range{ width:100%; height:var(--hit); accent-color:var(--accent-primary); }
 .a11y-select{ max-width:190px; }
 
+/* Los atajos de teclado solo tienen sentido con teclado físico y ratón:
+   se ocultan en móvil/táctil y solo aparecen en vista de computador. */
+#a11y-kbd-row{ display:none; }
+@media (hover:hover) and (pointer:fine){
+  #a11y-kbd-row{ display:flex; }
+}
+
+/* ==============================================================================
+   LOGOTIPO VECTORIZADO (Images/Logo.svg)
+   Se pinta con background-color + CSS mask en vez de <img>, así el logo
+   siempre toma el color de acento vigente: cambia solo con el tema claro/
+   oscuro y queda cubierto por el filtro de daltonismo de pantalla completa,
+   igual que el resto de la interfaz. La proporción real del ícono es ~2.1:1.
+   ============================================================================== */
+.logo-mark{
+  display:inline-block; flex:none; background-color:var(--accent-primary);
+  -webkit-mask:url('Images/Logo.svg') no-repeat center / contain;
+  mask:url('Images/Logo.svg') no-repeat center / contain;
+  transition:background-color .3s;
+}
+.topbar .logo-mark{ width:52px; height:25px; }
+.brand-hero .logo-mark{ width:120px; height:57px; filter:drop-shadow(0 4px 12px rgba(15,118,110,.28)); }
+[data-theme="dark"] .brand-hero .logo-mark{ filter:drop-shadow(0 4px 12px rgba(45,212,191,.22)); }
+@media (max-width:480px){
+  .brand-hero .logo-mark{ width:99px; height:47px; }
+  .topbar .logo-mark{ width:46px; height:22px; }
+}
+
 </style>
 </head>
 <body>
@@ -767,18 +816,7 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err=>{
       </div>
 
       <div class="brand-hero">
-        <svg class="logo-mark" viewBox="0 0 48 48" role="img" aria-label="Logo AccessRide Colombia">
-          <defs>
-            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color:#D97706"/>
-              <stop offset="100%" style="stop-color:#0F766E"/>
-            </linearGradient>
-          </defs>
-          <circle cx="24" cy="24" r="23" fill="url(#logoGrad)"/>
-          <path d="M12 30c0-2 1.5-4 4-4h4l2-6h8l3 6h1c2.2 0 4 1.8 4 4v3H12v-3z" fill="#fff"/>
-          <circle cx="18" cy="33" r="3" fill="#0F766E"/>
-          <circle cx="32" cy="33" r="3" fill="#0F766E"/>
-        </svg>
+<span class="logo-mark" role="img" aria-label="Logo AccessRide Colombia"></span>
         <div>
           <div class="brand-name">AccessRide Colombia</div>
           <div class="brand-sub">Transporte accesible, seguro e inclusivo</div>
@@ -967,7 +1005,7 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err=>{
 <!-- ============================================================ -->
 <section id="screen-client-home" class="screen" aria-label="Inicio del cliente">
   <header class="topbar">
-    <span class="brand"><svg width="26" height="26" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="23" fill="#D97706"/><path d="M12 30c0-2 1.5-4 4-4h4l2-6h8l3 6h1c2.2 0 4 1.8 4 4v3H12v-3z" fill="#fff"/></svg> AccessRide</span>
+    <span class="brand"><span class="logo-mark" aria-hidden="true"></span> AccessRide</span>
     <button class="btn-sm" style="background:none;border:2px solid var(--border);color:var(--text-primary);border-radius:10px;" onclick="handleLogout()">Salir</button>
   </header>
   <div class="address-bar">
@@ -1337,7 +1375,7 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err=>{
       <button type="button" class="btn btn-outline btn-sm" onclick="closeModal('modal-settings'); openDriverChat();">💬 Abrir</button>
     </div>
 
-    <div class="settings-row" style="border-top:1px solid var(--border-subtle);">
+    <div class="settings-row" id="a11y-kbd-row" style="border-top:1px solid var(--border-subtle);">
       <div class="settings-row-text">
         <strong>Atajos de teclado</strong>
         <span><kbd>Alt</kbd>+<kbd>A</kbd> accesibilidad · <kbd>Alt</kbd>+<kbd>M</kbd> micrófono · <kbd>Alt</kbd>+<kbd>C</kbd> chat · <kbd>Alt</kbd>+<kbd>L</kbd> leer pantalla · <kbd>Esc</kbd> cerrar</span>
@@ -2933,6 +2971,14 @@ const flashEl = document.createElement('div');
 flashEl.id = 'a11y-flash';
 flashEl.setAttribute('aria-hidden','true');
 document.body.appendChild(flashEl);
+
+/* Overlay del filtro de color para todo el daltonismo: cubre la pantalla
+   completa (mapa incluido) sin interceptar toques ni romper otros
+   elementos fijos. Su color lo decide el CSS según data-cvd. */
+const cvdOverlay = document.createElement('div');
+cvdOverlay.id = 'a11y-cvd-overlay';
+cvdOverlay.setAttribute('aria-hidden','true');
+document.body.appendChild(cvdOverlay);
 
 const toastBox = document.createElement('div');
 toastBox.id = 'a11y-toasts';
