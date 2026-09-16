@@ -237,6 +237,13 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent-primary); box-
 [data-theme="dark"] .sheet{box-shadow:0 -8px 30px rgba(0,0,0,.35);}
 .driver-card{display:flex; gap:1em; align-items:flex-start; padding:1em; border:1px solid var(--border); border-radius:var(--radius-sm); margin-bottom:.9em; background:var(--bg-secondary); transition:box-shadow .2s var(--ease), transform .2s var(--ease), border-color .2s;}
 .driver-card:hover, .driver-card:focus-within{box-shadow:var(--shadow-md); transform:translateY(-2px); border-color:var(--accent-primary);}
+.driver-card.selectable{cursor:pointer;}
+.driver-card.selectable:focus-visible{outline:var(--focus); outline-offset:2px;}
+.driver-card.chosen{border-color:var(--accent-primary); border-width:2px; box-shadow:0 0 0 4px rgba(15,118,110,.12);}
+[data-theme="dark"] .driver-card.chosen{box-shadow:0 0 0 4px rgba(45,212,191,.14);}
+.chosen-badge{display:inline-flex; align-items:center; gap:.35em; background:var(--accent-primary); color:#fff; font-weight:800; font-size:.78rem; padding:.25em .7em; border-radius:999px; margin-bottom:.5em;}
+[data-theme="dark"] .chosen-badge{color:#0B1120;}
+.pick-driver-btn{margin-top:.7em;}
 .driver-avatar{width:52px; height:52px; border-radius:50%; background:linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; flex:none; font-size:1.15rem; box-shadow:var(--shadow-sm); overflow:hidden;}
 .driver-avatar img{width:100%; height:100%; object-fit:cover; display:block; border-radius:50%;}
 .driver-meta{flex:1;}
@@ -488,6 +495,232 @@ input, select, textarea{ font-size:16px; }
   .map-wrap{ height:auto; min-height:180px; }
   .sheet{ min-height:auto; }
 }
+
+/* ==============================================================================
+   ACCESIBILIDAD AMPLIADA — AccessRide Colombia
+   Este bloque se añade al final de la hoja de estilos para que sus reglas
+   tengan prioridad sobre las anteriores sin modificar ninguna existente.
+   ============================================================================== */
+
+/* ---------- 1. TAMAÑO DE TEXTO DINÁMICO ---------- */
+/* --fs lo controla el usuario desde el menú de accesibilidad (0.85 – 1.6).
+   Se mantiene el escalado original por tamaño de pantalla, multiplicado. */
+html{ font-size: calc(112.5% * var(--fs, 1)); }
+@media (max-width:420px){ html{ font-size: calc(104% * var(--fs, 1)); } }
+@media (max-width:360px){ html{ font-size: calc(98%  * var(--fs, 1)); } }
+
+/* El diseño no se rompe al crecer el texto: todo fluye y se parte bien */
+input, select, textarea{ font-size: max(16px, 1rem); }   /* evita zoom iOS y escala */
+body, h1, h2, h3, h4, p, label, strong, span, li, .btn{ overflow-wrap:break-word; hyphens:auto; }
+.btn{ white-space:normal; height:auto; text-align:center; }
+.topbar{ gap:.5em; flex-wrap:wrap; }
+.topbar .brand{ min-width:0; flex:1 1 auto; }
+.address-bar{ flex-wrap:wrap; }
+.state-badge{ max-width:100%; }
+.stat-grid{ grid-template-columns:repeat(auto-fit, minmax(96px, 1fr)); }
+.stat-tile .num{ font-size:clamp(.95rem, 4vw, 1.15rem); }
+.fare-box{ flex-wrap:wrap; gap:.5em; }
+.driver-tags{ max-width:100%; }
+.settings-panel{ max-height:88vh; overflow-y:auto; }
+.modal{ overscroll-behavior:contain; }
+.bottom-nav button{ line-height:1.15; }
+
+/* ---------- 2. ÁREAS TÁCTILES AMPLIADAS (hit targets ≥ 48×48) ---------- */
+:root{ --hit:48px; }
+[data-hit="xl"]{ --hit:60px; }
+button, [role="button"]{ min-height:var(--hit); min-width:var(--hit); }
+.btn-sm{ min-height:var(--hit); min-width:var(--hit); }
+.topbar button{ min-height:var(--hit); min-width:var(--hit); padding:.35em .7em; border-radius:12px; }
+.theme-toggle{ min-height:var(--hit); }
+.bottom-nav button{ min-height:calc(var(--hit) + 16px + env(safe-area-inset-bottom)); }
+.check-row{ min-height:var(--hit); padding:.25em 0; }
+.check-row input{ width:24px; height:24px; }
+.check-row label{ padding:.3em 0; }
+.addr-suggestion{ min-height:var(--hit); display:flex; flex-direction:column; justify-content:center; }
+.settings-row{ min-height:var(--hit); }
+/* El área invisible del interruptor cubre toda la altura mínima táctil */
+.toggle-switch{ min-height:var(--hit); display:inline-flex; align-items:center; }
+.toggle-switch input{ height:var(--hit); top:50%; transform:translateY(-50%); }
+.toggle-track{ top:50%; transform:translateY(-50%); height:30px; }
+/* Controles de zoom de Leaflet con tamaño táctil cómodo */
+.leaflet-bar a, .leaflet-touch .leaflet-bar a{
+  width:var(--hit); height:var(--hit); line-height:var(--hit); font-size:1.35rem; font-weight:800;
+}
+.settings-fab{ width:52px; height:52px; }
+@media (max-width:480px){ .settings-fab{ width:48px; height:48px; } .settings-fab svg{ width:24px; height:24px; } }
+[data-hit="xl"] .settings-fab{ width:64px; height:64px; }
+[data-hit="xl"] .emergency-fab{ width:78px; height:78px; }
+
+/* ---------- 3. NAVEGACIÓN POR TECLADO / SWITCHES ---------- */
+.skip-link{
+  position:fixed; left:50%; transform:translateX(-50%) translateY(-200%); top:8px; z-index:3000;
+  background:var(--accent-primary); color:#fff; padding:.9em 1.4em; border-radius:var(--radius-xs);
+  font-weight:800; box-shadow:var(--shadow-lg); transition:transform .18s var(--ease);
+}
+.skip-link:focus{ transform:translateX(-50%) translateY(0); text-decoration:none; }
+[data-theme="dark"] .skip-link{ color:#0B1120; }
+[data-focus="strong"] :focus-visible{
+  outline:4px solid var(--accent-secondary) !important; outline-offset:3px !important;
+  box-shadow:0 0 0 7px color-mix(in srgb, var(--accent-secondary) 35%, transparent) !important;
+  border-radius:6px;
+}
+.scan-target{
+  outline:4px dashed var(--accent-secondary) !important; outline-offset:3px !important;
+  background:color-mix(in srgb, var(--accent-secondary) 14%, transparent) !important;
+  border-radius:8px;
+}
+.kbd-hint{ font-size:.82rem; color:var(--text-muted); }
+kbd{
+  background:var(--bg-tertiary); border:1px solid var(--border); border-bottom-width:2px;
+  border-radius:6px; padding:.1em .45em; font-family:inherit; font-size:.85em; font-weight:700;
+}
+
+/* ---------- 4. MODO DALTÓNICO (paletas alternativas) ---------- */
+/* No se usan filtros CSS sobre la página (romperían los elementos fijos);
+   en su lugar se sustituyen los tokens de color por paletas seguras. */
+[data-cvd="deuteranopia"], [data-cvd="protanopia"]{
+  --accent-primary:#1D4ED8;  --accent-primary-hover:#1E3A8A;
+  --accent-secondary:#B45309; --accent-secondary-hover:#92400E;
+  --accent-success:#0E7490;
+  --accent-danger:#A21CAF;   --accent-danger-hover:#86198F;
+}
+[data-theme="dark"][data-cvd="deuteranopia"], [data-theme="dark"][data-cvd="protanopia"]{
+  --accent-primary:#60A5FA;  --accent-primary-hover:#93C5FD;
+  --accent-secondary:#FBBF24; --accent-secondary-hover:#FCD34D;
+  --accent-success:#38BDF8;
+  --accent-danger:#E879F9;   --accent-danger-hover:#F0ABFC;
+}
+[data-cvd="tritanopia"]{
+  --accent-primary:#047857;  --accent-primary-hover:#065F46;
+  --accent-secondary:#BE123C; --accent-secondary-hover:#9F1239;
+  --accent-success:#15803D;
+  --accent-danger:#DC2626;   --accent-danger-hover:#B91C1C;
+}
+[data-theme="dark"][data-cvd="tritanopia"]{
+  --accent-primary:#34D399;  --accent-primary-hover:#6EE7B7;
+  --accent-secondary:#FB7185; --accent-secondary-hover:#FDA4AF;
+  --accent-success:#4ADE80;
+  --accent-danger:#F87171;   --accent-danger-hover:#FCA5A5;
+}
+/* Los fondos suaves (píldoras, banners, estados) se derivan del token activo
+   para que acompañen la paleta elegida en vez de quedarse en verde/rojo fijos. */
+[data-cvd]:not([data-cvd="off"]) .pill-teal{ background:color-mix(in srgb, var(--accent-primary) 14%, transparent); color:var(--accent-primary); }
+[data-cvd]:not([data-cvd="off"]) .pill-gold{ background:color-mix(in srgb, var(--accent-secondary) 14%, transparent); color:var(--accent-secondary); }
+[data-cvd]:not([data-cvd="off"]) .pill-green{ background:color-mix(in srgb, var(--accent-success) 14%, transparent); color:var(--accent-success); }
+[data-cvd]:not([data-cvd="off"]) .banner-ok,
+[data-cvd]:not([data-cvd="off"]) .route-banner.real,
+[data-cvd]:not([data-cvd="off"]) .state-found{ background:color-mix(in srgb, var(--accent-success) 12%, transparent); color:var(--accent-success); border-color:color-mix(in srgb, var(--accent-success) 30%, transparent); }
+[data-cvd]:not([data-cvd="off"]) .banner-error{ background:color-mix(in srgb, var(--accent-danger) 12%, transparent); color:var(--accent-danger); border-color:color-mix(in srgb, var(--accent-danger) 30%, transparent); }
+[data-cvd]:not([data-cvd="off"]) .route-banner.fallback,
+[data-cvd]:not([data-cvd="off"]) .state-searching{ background:color-mix(in srgb, var(--accent-secondary) 12%, transparent); color:var(--accent-secondary); border-color:color-mix(in srgb, var(--accent-secondary) 30%, transparent); }
+[data-cvd]:not([data-cvd="off"]) .state-enroute{ background:color-mix(in srgb, var(--accent-primary) 12%, transparent); color:var(--accent-primary); border-color:color-mix(in srgb, var(--accent-primary) 30%, transparent); }
+[data-cvd]:not([data-cvd="off"]) .address-bar .dot{ background:var(--accent-success); box-shadow:0 0 0 4px color-mix(in srgb, var(--accent-success) 22%, transparent); }
+
+/* Nunca depender solo del color: refuerzo con símbolo + forma */
+.banner-ok::before{ content:"✓ "; font-weight:900; }
+.banner-error::before{ content:"⚠ "; font-weight:900; }
+.address-bar .dot{ position:relative; }
+.address-bar .dot::after{
+  content:""; position:absolute; inset:3px; border-radius:50%; background:var(--bg-secondary);
+}
+/* Estado de disponibilidad de vehículo: además del color, un patrón de borde */
+[data-cvd]:not([data-cvd="off"]) .driver-card.chosen{ border-style:solid; }
+[data-cvd]:not([data-cvd="off"]) .recommended{ border-style:dashed; }
+
+/* ---------- 5. MOVIMIENTO REDUCIDO (opcional desde el menú) ---------- */
+[data-motion="reduced"] *{
+  animation-duration:.001ms !important; animation-iteration-count:1 !important;
+  transition-duration:.001ms !important; scroll-behavior:auto !important;
+}
+
+/* ---------- 6. ALERTAS VISUALES Y HÁPTICAS ---------- */
+#a11y-flash{
+  position:fixed; inset:0; background:var(--accent-secondary); opacity:0;
+  pointer-events:none; z-index:2000; transition:opacity .2s ease;
+}
+#a11y-flash.on{ opacity:.42; }
+#a11y-toasts{
+  position:fixed; left:50%; transform:translateX(-50%);
+  bottom:calc(84px + env(safe-area-inset-bottom)); z-index:1500;
+  display:flex; flex-direction:column; gap:.5em; width:min(540px, 92vw); pointer-events:none;
+}
+.a11y-toast{
+  pointer-events:auto; background:var(--bg-elevated); color:var(--text-primary);
+  border:2px solid var(--accent-primary); border-left-width:8px; border-radius:var(--radius-sm);
+  padding:.9em 1.1em; box-shadow:var(--shadow-lg); font-weight:700;
+  display:flex; align-items:center; gap:.7em; animation:toastIn .25s var(--ease);
+}
+.a11y-toast.alert{ border-color:var(--accent-danger); }
+.a11y-toast.ok{ border-color:var(--accent-success); }
+.a11y-toast .ico{ font-size:1.4rem; flex:none; }
+@keyframes toastIn{ from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);} }
+
+/* ---------- 7. CONTROL POR VOZ ---------- */
+.voice-fab{
+  position:fixed; right:1.1em; bottom:calc(64px + 1.6em + 84px + env(safe-area-inset-bottom));
+  z-index:600; background:var(--accent-primary); color:#fff; border:none; border-radius:999px;
+  width:64px; height:64px; display:flex; align-items:center; justify-content:center;
+  font-size:1.5rem; box-shadow:var(--shadow-md);
+}
+[data-theme="dark"] .voice-fab{ color:#0B1120; }
+.voice-fab.listening{ background:var(--accent-danger); color:#fff; animation:micPulse 1.4s ease infinite; }
+@keyframes micPulse{ 0%,100%{ box-shadow:0 0 0 0 color-mix(in srgb, var(--accent-danger) 60%, transparent); } 60%{ box-shadow:0 0 0 16px transparent; } }
+@media (max-width:480px){ .voice-fab{ width:56px; height:56px; right:.9em; } }
+.voice-caption{
+  position:fixed; left:50%; transform:translateX(-50%);
+  bottom:calc(150px + env(safe-area-inset-bottom)); z-index:1400;
+  background:var(--bg-elevated); border:2px solid var(--accent-primary); color:var(--text-primary);
+  padding:.7em 1.1em; border-radius:999px; font-weight:700; max-width:92vw; box-shadow:var(--shadow-md);
+}
+
+/* ---------- 8. CONTROLES DE MAPA SIN GESTOS COMPLEJOS ---------- */
+.map-a11y-controls{
+  position:absolute; right:10px; bottom:34px; z-index:1000;
+  display:flex; flex-direction:column; gap:.4em;
+}
+.map-a11y-controls button{
+  width:var(--hit); height:var(--hit); min-width:var(--hit); border-radius:12px;
+  background:var(--bg-secondary); color:var(--text-primary); border:2px solid var(--border);
+  font-size:1.2rem; font-weight:800; box-shadow:var(--shadow-sm); display:flex; align-items:center; justify-content:center;
+}
+.map-a11y-controls button:hover{ border-color:var(--accent-primary); color:var(--accent-primary); }
+
+/* ---------- 9. CHAT CON EL CONDUCTOR ---------- */
+.chat-log{
+  border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--bg-primary);
+  padding:.9em; height:min(46vh, 340px); overflow-y:auto; display:flex; flex-direction:column; gap:.6em;
+  margin-bottom:.9em;
+}
+.chat-msg{ max-width:88%; padding:.7em .95em; border-radius:16px; line-height:1.45; font-size:.98rem; }
+.chat-msg .who{ display:block; font-size:.75rem; font-weight:800; opacity:.8; margin-bottom:.2em; }
+.chat-msg .time{ display:block; font-size:.72rem; opacity:.7; margin-top:.25em; }
+.chat-msg.me{ align-self:flex-end; background:var(--accent-primary); color:#fff; border-bottom-right-radius:4px; }
+[data-theme="dark"] .chat-msg.me{ color:#0B1120; }
+.chat-msg.driver{ align-self:flex-start; background:var(--bg-tertiary); color:var(--text-primary); border:1px solid var(--border); border-bottom-left-radius:4px; }
+.chat-msg.system{ align-self:center; background:transparent; color:var(--text-muted); font-size:.85rem; text-align:center; max-width:100%; }
+.chat-quick{ display:flex; flex-wrap:wrap; gap:.5em; margin-bottom:.9em; }
+.chat-quick button{
+  min-height:var(--hit); padding:.5em .9em; border-radius:999px; border:2px solid var(--accent-primary);
+  background:transparent; color:var(--accent-primary); font-weight:700; font-size:.9rem; min-width:auto;
+}
+.chat-quick button:hover{ background:var(--accent-primary); color:#fff; }
+[data-theme="dark"] .chat-quick button:hover{ color:#0B1120; }
+.chat-form{ display:flex; gap:.6em; align-items:flex-end; }
+.chat-form textarea{ flex:1; resize:vertical; min-height:var(--hit); }
+.chat-typing{ font-size:.85rem; color:var(--text-muted); min-height:1.3em; margin:0 0 .5em; }
+.chat-badge{
+  display:inline-flex; align-items:center; justify-content:center; min-width:22px; height:22px;
+  border-radius:999px; background:var(--accent-danger); color:#fff; font-size:.75rem; font-weight:800; padding:0 .4em;
+}
+.a11y-section-title{
+  font-family:var(--font-disp); font-weight:800; color:var(--accent-primary);
+  margin:1.3em 0 .1em; font-size:1rem; display:flex; align-items:center; gap:.5em;
+}
+.fs-controls{ display:flex; align-items:center; gap:.6em; }
+.fs-controls button{ width:var(--hit); height:var(--hit); border-radius:12px; border:2px solid var(--border); background:var(--bg-primary); color:var(--text-primary); font-size:1.2rem; font-weight:800; }
+#a11y-font-range{ width:100%; height:var(--hit); accent-color:var(--accent-primary); }
+.a11y-select{ max-width:190px; }
+
 </style>
 </head>
 <body>
@@ -518,7 +751,7 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err=>{
 <!-- ============================================================ -->
 <!-- LIVE REGION for screen reader announcements -->
 <!-- ============================================================ -->
-<div id="live-region" class="sr-only" aria-live="polite"></div>
+<div id="live-region" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
 <!-- ============================================================ -->
 <!-- LANDING -->
@@ -618,7 +851,7 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err=>{
         <legend>Foto de perfil</legend>
         <div style="display:flex; flex-direction:column; align-items:center; gap:.8em;">
           <div class="driver-avatar" id="c-avatar-preview" style="width:96px;height:96px;font-size:2rem;"></div>
-          <input id="c-foto" type="file" accept="image/*" class="sr-only" onchange="onProfilePhotoChange(event)">
+          <input id="c-foto" type="file" accept="image/*" class="sr-only" aria-label="Seleccionar una foto de perfil desde tu dispositivo" onchange="onProfilePhotoChange(event)">
           <div style="display:flex; gap:.6em; flex-wrap:wrap; justify-content:center;">
             <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('c-foto').click()">📷 Subir foto</button>
             <button type="button" class="btn btn-ghost btn-sm" id="c-foto-remove-btn" onclick="removeProfilePhoto()" style="display:none;">Quitar foto</button>
@@ -753,14 +986,14 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err=>{
     <p class="help">Solicita un vehículo adaptado a tus necesidades.</p>
     <button class="btn btn-gold btn-block" onclick="openRequestFlow()">🚐 Solicitar un viaje</button>
 
-    <div class="section-title"><h3 style="margin:0;">Conductores cercanos</h3><span class="pill pill-teal" id="drivers-count-pill">0 disponibles</span></div>
+    <div class="section-title"><h3 style="margin:0;">Conductores cercanos</h3><span class="pill pill-teal" id="drivers-count-pill" role="status" aria-live="polite">0 disponibles</span></div>
     <div id="nearby-drivers-list"></div>
   </div>
-  <button class="emergency-fab" onclick="triggerEmergency()" aria-label="Botón de emergencia">🆘<br>SOS</button>
+  <button class="emergency-fab" onclick="triggerEmergency()" aria-label="Botón de emergencia SOS: avisa a tu contacto de confianza y comparte tu ubicación"><span aria-hidden="true">🆘<br>SOS</span></button>
   <nav class="bottom-nav" aria-label="Navegación principal">
-    <button aria-current="page" onclick="goTo('screen-client-home')">🏠<span>Inicio</span></button>
-    <button onclick="goTo('screen-history')">🕒<span>Historial</span></button>
-    <button onclick="goTo('screen-profile')">👤<span>Perfil</span></button>
+    <button aria-current="page" onclick="goTo('screen-client-home')" aria-label="Inicio"><span aria-hidden="true">🏠</span><span>Inicio</span></button>
+    <button onclick="goTo('screen-history')" aria-label="Historial de viajes"><span aria-hidden="true">🕒</span><span>Historial</span></button>
+    <button onclick="goTo('screen-profile')" aria-label="Mi perfil"><span aria-hidden="true">👤</span><span>Perfil</span></button>
   </nav>
 </section>
 
@@ -821,10 +1054,9 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err=>{
           <div id="fare-time" class="help" style="margin:0;"></div>
         </div>
       </div>
-      <h3>Conductor recomendado</h3>
-      <div id="recommended-driver-box"></div>
-      <h3 style="margin-top:1.2em;">Otros conductores compatibles</h3>
-      <div id="other-drivers-box"></div>
+      <h3>Elige tu conductor</h3>
+      <p class="help" style="margin-top:-.4em;">Te sugerimos el mejor conductor según tus necesidades, pero puedes elegir cualquier otro de la lista.</p>
+      <div id="drivers-choice-list"></div>
       <div style="display:flex; gap:.9em; margin-top:1.2em;">
         <button class="btn btn-outline btn-block" onclick="backToStep1()">Volver</button>
         <button class="btn btn-gold btn-block" onclick="confirmTrip()">Confirmar viaje</button>
@@ -855,7 +1087,10 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err=>{
       <div class="stat-tile"><span class="num" id="track-fare">--</span><span class="lbl">tarifa</span></div>
     </div>
     <div class="progress-track"><div class="progress-fill" id="track-progress"></div></div>
-    <div style="display:flex; gap:.9em;">
+    <button class="btn btn-primary btn-block" id="btn-open-chat" style="margin-bottom:.9em;" onclick="openDriverChat()" aria-label="Abrir chat con el conductor">
+      💬 Escribir al conductor <span id="chat-unread" class="chat-badge" style="display:none;" aria-hidden="true"></span>
+    </button>
+    <div style="display:flex; gap:.9em; flex-wrap:wrap;">
       <button class="btn btn-outline btn-block" onclick="callTrustedContact()">📞 Contacto de confianza</button>
       <button class="btn btn-danger btn-block" onclick="triggerEmergency()">🆘 Emergencia</button>
     </div>
@@ -940,6 +1175,208 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err=>{
         <span class="toggle-track"></span>
       </span>
     </label>
+
+    <!-- ===== ACCESIBILIDAD VISUAL ===== -->
+    <h3 class="a11y-section-title">👁️ Accesibilidad visual</h3>
+
+    <div class="settings-row">
+      <div class="settings-row-text" style="flex:1;">
+        <strong><label for="a11y-font-range" style="margin:0;display:inline;">Tamaño del texto</label></strong>
+        <span>Agranda o reduce toda la letra de la aplicación</span>
+        <div class="fs-controls" style="margin-top:.6em;">
+          <button type="button" onclick="a11yFontStep(-0.05)" aria-label="Reducir el tamaño del texto">A−</button>
+          <input id="a11y-font-range" type="range" min="0.85" max="1.6" step="0.05" value="1"
+                 aria-label="Tamaño del texto"
+                 oninput="a11ySet('fontScale', parseFloat(this.value))">
+          <button type="button" onclick="a11yFontStep(0.05)" aria-label="Aumentar el tamaño del texto">A+</button>
+          <output id="a11y-font-value" for="a11y-font-range" style="min-width:3.4em;text-align:right;font-weight:800;">100%</output>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-row">
+      <div class="settings-row-text">
+        <strong><label for="a11y-cvd" style="margin:0;display:inline;">Modo daltónico</label></strong>
+        <span>Paletas seguras para deuteranopía, protanopía y tritanopía</span>
+      </div>
+      <select id="a11y-cvd" class="a11y-select" onchange="a11ySet('cvd', this.value)">
+        <option value="off">Sin filtro</option>
+        <option value="deuteranopia">Deuteranopía</option>
+        <option value="protanopia">Protanopía</option>
+        <option value="tritanopia">Tritanopía</option>
+      </select>
+    </div>
+
+    <label class="settings-row" for="a11y-tts" style="cursor:pointer;">
+      <div class="settings-row-text">
+        <strong>Lectura en voz alta</strong>
+        <span>La app lee los avisos importantes con voz sintetizada</span>
+      </div>
+      <span class="toggle-switch">
+        <input type="checkbox" id="a11y-tts" onchange="a11ySet('tts', this.checked)">
+        <span class="toggle-track"></span>
+      </span>
+    </label>
+
+    <label class="settings-row" for="a11y-motion" style="cursor:pointer;">
+      <div class="settings-row-text">
+        <strong>Reducir animaciones</strong>
+        <span>Quita transiciones y movimientos que pueden marear</span>
+      </div>
+      <span class="toggle-switch">
+        <input type="checkbox" id="a11y-motion" onchange="a11ySet('reduceMotion', this.checked)">
+        <span class="toggle-track"></span>
+      </span>
+    </label>
+
+    <!-- ===== ACCESIBILIDAD MOTORA Y FÍSICA ===== -->
+    <h3 class="a11y-section-title">✋ Accesibilidad motora</h3>
+
+    <label class="settings-row" for="a11y-hit" style="cursor:pointer;">
+      <div class="settings-row-text">
+        <strong>Botones extra grandes</strong>
+        <span>Amplía las zonas táctiles de 48 a 60 píxeles</span>
+      </div>
+      <span class="toggle-switch">
+        <input type="checkbox" id="a11y-hit" onchange="a11ySet('hitXL', this.checked)">
+        <span class="toggle-track"></span>
+      </span>
+    </label>
+
+    <label class="settings-row" for="a11y-voice" style="cursor:pointer;">
+      <div class="settings-row-text">
+        <strong>Control por voz</strong>
+        <span>Pide viajes y navega hablando, sin usar el teclado</span>
+      </div>
+      <span class="toggle-switch">
+        <input type="checkbox" id="a11y-voice" onchange="a11ySet('voice', this.checked)">
+        <span class="toggle-track"></span>
+      </span>
+    </label>
+    <p class="kbd-hint" style="margin:-.3em 0 .6em;">
+      Di <em>“solicitar un viaje”</em>, <em>“llévame a…”</em>, <em>“emergencia”</em> o <em>“ayúdame”</em> para ver todos los comandos.
+      <button type="button" class="btn btn-ghost btn-sm" style="margin-top:.5em;" onclick="a11yVoiceHelp()">Ver comandos de voz</button>
+    </p>
+
+    <label class="settings-row" for="a11y-mapctl" style="cursor:pointer;">
+      <div class="settings-row-text">
+        <strong>Mapa sin gestos complejos</strong>
+        <span>Botones de zoom y centrado en vez de pellizcar o deslizar</span>
+      </div>
+      <span class="toggle-switch">
+        <input type="checkbox" id="a11y-mapctl" onchange="a11ySet('mapControls', this.checked)">
+        <span class="toggle-track"></span>
+      </span>
+    </label>
+
+    <label class="settings-row" for="a11y-focus" style="cursor:pointer;">
+      <div class="settings-row-text">
+        <strong>Foco de teclado reforzado</strong>
+        <span>Marca con un borde grueso el elemento seleccionado</span>
+      </div>
+      <span class="toggle-switch">
+        <input type="checkbox" id="a11y-focus" onchange="a11ySet('strongFocus', this.checked)">
+        <span class="toggle-track"></span>
+      </span>
+    </label>
+
+    <label class="settings-row" for="a11y-scan" style="cursor:pointer;">
+      <div class="settings-row-text">
+        <strong>Modo barrido (switch externo)</strong>
+        <span>Recorre los botones solo; actívalos con Enter o tu pulsador</span>
+      </div>
+      <span class="toggle-switch">
+        <input type="checkbox" id="a11y-scan" onchange="a11ySet('scan', this.checked)">
+        <span class="toggle-track"></span>
+      </span>
+    </label>
+
+    <div class="settings-row" id="a11y-scan-speed-row" style="display:none;">
+      <div class="settings-row-text">
+        <strong><label for="a11y-scan-speed" style="margin:0;display:inline;">Velocidad del barrido</label></strong>
+        <span>Tiempo que se detiene en cada elemento</span>
+      </div>
+      <select id="a11y-scan-speed" class="a11y-select" onchange="a11ySetScanSpeed(this.value)">
+        <option value="1200">Rápida (1,2 s)</option>
+        <option value="2200">Media (2,2 s)</option>
+        <option value="3500">Lenta (3,5 s)</option>
+        <option value="5000">Muy lenta (5 s)</option>
+      </select>
+    </div>
+
+    <!-- ===== ACCESIBILIDAD AUDITIVA ===== -->
+    <h3 class="a11y-section-title">👂 Accesibilidad auditiva</h3>
+
+    <label class="settings-row" for="a11y-haptics" style="cursor:pointer;">
+      <div class="settings-row-text">
+        <strong>Alertas vibratorias</strong>
+        <span>Vibración distinta para llegada, mensaje y emergencia</span>
+      </div>
+      <span class="toggle-switch">
+        <input type="checkbox" id="a11y-haptics" onchange="a11ySet('haptics', this.checked)">
+        <span class="toggle-track"></span>
+      </span>
+    </label>
+
+    <label class="settings-row" for="a11y-flash" style="cursor:pointer;">
+      <div class="settings-row-text">
+        <strong>Destellos visuales</strong>
+        <span>La pantalla parpadea suavemente en los avisos importantes</span>
+      </div>
+      <span class="toggle-switch">
+        <input type="checkbox" id="a11y-flash" onchange="a11ySet('flash', this.checked)">
+        <span class="toggle-track"></span>
+      </span>
+    </label>
+
+    <div class="settings-row">
+      <div class="settings-row-text">
+        <strong>Chat con el conductor</strong>
+        <span>Siempre disponible durante el viaje, para escribir en vez de hablar</span>
+      </div>
+      <button type="button" class="btn btn-outline btn-sm" onclick="closeModal('modal-settings'); openDriverChat();">💬 Abrir</button>
+    </div>
+
+    <div class="settings-row" style="border-top:1px solid var(--border-subtle);">
+      <div class="settings-row-text">
+        <strong>Atajos de teclado</strong>
+        <span><kbd>Alt</kbd>+<kbd>A</kbd> accesibilidad · <kbd>Alt</kbd>+<kbd>M</kbd> micrófono · <kbd>Alt</kbd>+<kbd>C</kbd> chat · <kbd>Alt</kbd>+<kbd>L</kbd> leer pantalla · <kbd>Esc</kbd> cerrar</span>
+      </div>
+    </div>
+
+    <button type="button" class="btn btn-ghost btn-block" style="margin-top:1em;" onclick="a11yReset()">↺ Restablecer ajustes de accesibilidad</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- CHAT CON EL CONDUCTOR (accesibilidad auditiva y del habla) -->
+<!-- ============================================================ -->
+<div id="modal-chat" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="chat-title"
+     onclick="if(event.target===this) closeModal('modal-chat')">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.3em;gap:.6em;">
+      <h2 id="chat-title" style="margin-bottom:0;">💬 Chat con el conductor</h2>
+      <button type="button" class="btn-sm" style="background:none;border:none;font-size:1.3rem;color:var(--text-muted);"
+              onclick="closeModal('modal-chat')" aria-label="Cerrar el chat">✕</button>
+    </div>
+    <p class="help">Escribe en vez de hablar. Útil si no puedes oír o prefieres no usar la voz.</p>
+
+    <div id="chat-log" class="chat-log" role="log" aria-live="polite" aria-label="Conversación con el conductor"></div>
+    <p id="chat-typing" class="chat-typing" aria-live="polite"></p>
+
+    <h3 style="font-size:1rem;margin-bottom:.4em;">Frases rápidas</h3>
+    <div id="chat-quick" class="chat-quick" role="group" aria-label="Frases rápidas para enviar al conductor"></div>
+
+    <form class="chat-form" onsubmit="event.preventDefault(); sendChatMessage(); return false;">
+      <label for="chat-input" class="sr-only">Escribe tu mensaje para el conductor</label>
+      <textarea id="chat-input" rows="1" placeholder="Escribe tu mensaje…"
+                onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendChatMessage();}"></textarea>
+      <button type="submit" class="btn btn-primary btn-sm" aria-label="Enviar mensaje">➤</button>
+    </form>
+    <button type="button" class="btn btn-ghost btn-block btn-sm" style="margin-top:.7em;" onclick="chatReadLast()">
+      🔊 Leer en voz alta el último mensaje del conductor
+    </button>
+    <p class="help" style="margin:.7em 0 0;text-align:center;">Prototipo académico: las respuestas del conductor son simuladas.</p>
   </div>
 </div>
 
@@ -1546,21 +1983,40 @@ function placeNearbyDrivers(){
 
 function renderNearbyList(){
   const box = document.getElementById('nearby-drivers-list');
-  box.innerHTML = generatedDrivers.slice(0,4).map(d=>driverCardHTML(d,false)).join('');
+  box.innerHTML = generatedDrivers.slice(0,4).map(d=>driverCardHTML(d)).join('');
 }
 
-function driverCardHTML(d, recommended, reasons){
+function driverCardHTML(d, opts){
+  opts = opts || {};
+  const recommended = opts.recommended;
+  const chosen = opts.chosen;
+  const reasons = opts.reasons;
+  const selectable = opts.selectable;
   const tags = d.adaptations.map(a=>`<span class="pill pill-teal">${ADAPTATION_LABELS[a]}</span>`).join(' ');
   const petTag = d.pet ? `<span class="pill pill-green">🐾 Pet Friendly</span>` : '';
+  const badge = chosen
+    ? '<div class="chosen-badge">✓ Conductor elegido</div>'
+    : (recommended ? '<div class="recommended-badge">⭐ Recomendado para ti</div>' : '');
+  const classes = ['driver-card'];
+  if(recommended || chosen) classes.push('recommended');
+  if(chosen) classes.push('chosen');
+  if(selectable) classes.push('selectable');
+
+  const interactiveAttrs = selectable
+    ? `role="button" tabindex="0" aria-pressed="${chosen?'true':'false'}"
+       onclick="selectTripDriver(${d.id})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); selectTripDriver(${d.id});}"`
+    : '';
+
   return `
-  <div class="driver-card ${recommended?'recommended':''}">
+  <div class="${classes.join(' ')}" ${interactiveAttrs} aria-label="${selectable ? (escapeHtml(d.name) + (chosen ? ', conductor elegido' : ', tocar para elegir')) : ''}">
     <div class="driver-avatar">${avatarImg(d.name)}</div>
     <div class="driver-meta">
-      ${recommended?'<div class="recommended-badge">⭐ Conductor recomendado</div>':''}
+      ${badge}
       <strong>${d.name}</strong> — ${d.rating.toFixed(1)}★<br>
       <span class="help" style="margin:0;">${d.vehicle} · ${d.plate} · ${d.distance.toFixed(1)} km</span>
       <div class="driver-tags">${tags} ${petTag}</div>
       ${reasons ? `<ul class="why-list">${reasons.map(r=>`<li>${r}</li>`).join('')}</ul>` : ''}
+      ${selectable ? `<button type="button" class="btn ${chosen?'btn-primary':'btn-outline'} btn-sm pick-driver-btn" onclick="event.stopPropagation(); selectTripDriver(${d.id})">${chosen?'Conductor elegido':'Elegir este conductor'}</button>` : ''}
     </div>
   </div>`;
 }
@@ -1894,13 +2350,44 @@ async function calculateTrip(){
 
   const client = currentProfile || {};
   const ranked = rankDrivers(client, generatedDrivers);
-  const [best, ...rest] = ranked;
-  document.getElementById('recommended-driver-box').innerHTML = best ? driverCardHTML(best, true, best.reasons) : '<p class="help">No encontramos conductores compatibles cerca. Intenta de nuevo en unos minutos.</p>';
-  document.getElementById('other-drivers-box').innerHTML = rest.slice(0,3).map(d=>driverCardHTML(d,false)).join('') || '<p class="help">No hay más conductores compatibles cerca.</p>';
-  currentTrip.chosenDriver = best;
+  currentTrip.rankedDrivers = ranked;
+  currentTrip.recommendedId = ranked.length ? ranked[0].id : null;
+  currentTrip.chosenDriver = ranked.length ? ranked[0] : null;
+  renderDriverChoiceList();
 
   document.getElementById('request-step-1').classList.add('hidden');
   document.getElementById('request-step-2').classList.remove('hidden');
+}
+
+/* Dibuja la lista completa de conductores compatibles como tarjetas
+   seleccionables. El primero de "ranked" queda pre-elegido (recomendado),
+   pero cualquiera de la lista puede tocarse para convertirse en el
+   conductor del viaje. */
+function renderDriverChoiceList(){
+  const box = document.getElementById('drivers-choice-list');
+  if(!currentTrip || !currentTrip.rankedDrivers || !currentTrip.rankedDrivers.length){
+    box.innerHTML = '<p class="help">No encontramos conductores compatibles cerca. Intenta de nuevo en unos minutos.</p>';
+    return;
+  }
+  const chosenId = currentTrip.chosenDriver ? currentTrip.chosenDriver.id : null;
+  box.innerHTML = currentTrip.rankedDrivers.map(d=>driverCardHTML(d, {
+    recommended: d.id === currentTrip.recommendedId,
+    chosen: d.id === chosenId,
+    reasons: d.reasons,
+    selectable: true
+  })).join('');
+}
+
+/* Se llama al tocar una tarjeta o su botón "Elegir este conductor".
+   Cambia cuál conductor viajará realmente, sin perder la ruta ni la
+   tarifa ya calculadas. */
+function selectTripDriver(driverId){
+  if(!currentTrip || !currentTrip.rankedDrivers) return;
+  const picked = currentTrip.rankedDrivers.find(d=>d.id===driverId);
+  if(!picked) return;
+  currentTrip.chosenDriver = picked;
+  renderDriverChoiceList();
+  announce("Elegiste a " + picked.name + " como tu conductor.");
 }
 
 function drawRoutePreview(pickup, dest, coords){
@@ -2017,7 +2504,7 @@ function remainingCoords(coords, t){
 async function setupTracking(){
   document.getElementById('tracking-status').innerHTML = '<span class="spinner spinner-dark" aria-hidden="true"></span>Buscando la mejor ruta hacia ti…';
   document.getElementById('tracking-status').className = 'state-badge state-searching';
-  document.getElementById('tracking-driver-card').outerHTML = driverCardHTML(activeRide.driver, false).replace('<div class="driver-card','<div class="driver-card" id="tracking-driver-card"');
+  document.getElementById('tracking-driver-card').outerHTML = driverCardHTML(activeRide.driver).replace('<div class="driver-card','<div class="driver-card" id="tracking-driver-card"');
   document.getElementById('track-fare').textContent = formatCOP(activeRide.fare);
 
   if(trackMap) { trackMap.remove(); trackMap=null; }
@@ -2276,5 +2763,896 @@ document.addEventListener('DOMContentLoaded', ()=>{
   updateAvatarPreview();
 });
 </script>
+<script>
+/* ==============================================================================
+   ACCESSRIDE COLOMBIA — MÓDULO DE ACCESIBILIDAD AMPLIADA
+   Se ejecuta después de la lógica principal y NO la modifica: solo envuelve
+   algunas funciones globales (announce, openModal, closeModal, goTo…) para
+   añadirles comportamiento. Si algo de aquí falla, la app sigue funcionando.
+   ============================================================================== */
+(function(){
+'use strict';
+
+/* ------------------------------------------------------------------
+   0. Preferencias persistentes
+   ------------------------------------------------------------------ */
+const STORE_KEY = 'accessride-a11y';
+const DEFAULTS = {
+  fontScale: 1,        // 0.85 – 1.6
+  cvd: 'off',          // off | deuteranopia | protanopia | tritanopia
+  hitXL: false,        // áreas táctiles extra grandes
+  tts: false,          // lectura en voz alta de los avisos
+  voice: false,        // control por voz
+  scan: false,         // barrido automático para switches
+  scanSpeed: 2200,     // ms entre saltos del barrido
+  strongFocus: false,  // foco de teclado reforzado
+  haptics: true,       // vibración en alertas
+  flash: true,         // destello visual en alertas
+  mapControls: true,   // botones de mapa sin gestos complejos
+  reduceMotion: false  // animaciones reducidas
+};
+let A = Object.assign({}, DEFAULTS);
+
+function loadPrefs(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw) A = Object.assign({}, DEFAULTS, JSON.parse(raw));
+  }catch(e){ /* almacenamiento no disponible: se usan los valores por defecto */ }
+}
+function persist(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(A)); }catch(e){}
+  savePrefsToCloud();
+}
+let cloudTimer = null;
+function savePrefsToCloud(){
+  // Guarda en Firestore solo si hay sesión, y con retardo para no escribir en cada clic.
+  clearTimeout(cloudTimer);
+  cloudTimer = setTimeout(()=>{
+    try{
+      if(typeof session === 'undefined' || !session || !session.uid) return;
+      if(typeof db === 'undefined') return;
+      db.collection(USERS_COLLECTION).doc(session.uid)
+        .set({ preferencias: { accesibilidad: A } , actualizadoEn: serverTimestamp()}, {merge:true})
+        .catch(err=>console.warn('No se guardaron las preferencias de accesibilidad:', err));
+    }catch(e){ /* silencioso */ }
+  }, 900);
+}
+
+/* ------------------------------------------------------------------
+   1. Aplicar preferencias al documento
+   ------------------------------------------------------------------ */
+function applyAll(){
+  const root = document.documentElement;
+  root.style.setProperty('--fs', String(A.fontScale));
+  root.setAttribute('data-cvd', A.cvd || 'off');
+  root.setAttribute('data-hit', A.hitXL ? 'xl' : 'normal');
+  root.setAttribute('data-focus', A.strongFocus ? 'strong' : 'normal');
+  root.setAttribute('data-motion', A.reduceMotion ? 'reduced' : 'normal');
+  syncPanel();
+  toggleVoiceUI(A.voice);
+  toggleScanning(A.scan);
+  renderMapControls();
+  // El mapa necesita recalcular su tamaño si cambió la tipografía
+  setTimeout(()=>{ try{ if(typeof map!=='undefined' && map) map.invalidateSize(); }catch(e){} }, 220);
+}
+
+function syncPanel(){
+  const set = (id, prop, val)=>{ const el = document.getElementById(id); if(el) el[prop] = val; };
+  set('a11y-font-range','value', A.fontScale);
+  const out = document.getElementById('a11y-font-value');
+  if(out) out.textContent = Math.round(A.fontScale*100) + '%';
+  set('a11y-cvd','value', A.cvd);
+  set('a11y-hit','checked', A.hitXL);
+  set('a11y-tts','checked', A.tts);
+  set('a11y-voice','checked', A.voice);
+  set('a11y-scan','checked', A.scan);
+  set('a11y-scan-speed','value', String(A.scanSpeed));
+  set('a11y-focus','checked', A.strongFocus);
+  set('a11y-haptics','checked', A.haptics);
+  set('a11y-flash','checked', A.flash);
+  set('a11y-mapctl','checked', A.mapControls);
+  set('a11y-motion','checked', A.reduceMotion);
+  const speedRow = document.getElementById('a11y-scan-speed-row');
+  if(speedRow) speedRow.style.display = A.scan ? '' : 'none';
+}
+
+/* API pública usada por el panel de configuración */
+window.a11ySet = function(key, value){
+  A[key] = value;
+  persist();
+  applyAll();
+  const labels = {
+    fontScale:'Tamaño de texto', cvd:'Modo daltónico', hitXL:'Áreas táctiles grandes',
+    tts:'Lectura en voz alta', voice:'Control por voz', scan:'Modo barrido',
+    strongFocus:'Foco de teclado reforzado', haptics:'Alertas vibratorias',
+    flash:'Destellos visuales', mapControls:'Controles de mapa', reduceMotion:'Movimiento reducido'
+  };
+  if(typeof value === 'boolean'){
+    announce(labels[key] + (value ? ' activado' : ' desactivado'));
+  }
+};
+window.a11yFontStep = function(delta){
+  const next = Math.min(1.6, Math.max(0.85, Math.round((A.fontScale + delta)*100)/100));
+  window.a11ySet('fontScale', next);
+  announce('Tamaño de texto al ' + Math.round(next*100) + ' por ciento');
+};
+window.a11yReset = function(){
+  A = Object.assign({}, DEFAULTS);
+  persist(); applyAll();
+  announce('Ajustes de accesibilidad restablecidos');
+  toast('Ajustes de accesibilidad restablecidos', 'ok', '↺');
+};
+
+/* ------------------------------------------------------------------
+   2. Lectura en voz alta (TTS) + envoltura de announce()
+   ------------------------------------------------------------------ */
+let esVoice = null;
+function pickVoice(){
+  if(!('speechSynthesis' in window)) return;
+  const voices = speechSynthesis.getVoices() || [];
+  esVoice = voices.find(v=>/es[-_]CO/i.test(v.lang)) ||
+            voices.find(v=>/^es/i.test(v.lang)) || null;
+}
+if('speechSynthesis' in window){
+  pickVoice();
+  speechSynthesis.onvoiceschanged = pickVoice;
+}
+function speak(text, force){
+  if(!force && !A.tts) return;
+  if(!('speechSynthesis' in window) || !text) return;
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(String(text));
+    u.lang = 'es-CO';
+    if(esVoice) u.voice = esVoice;
+    u.rate = 1; u.pitch = 1;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+window.a11ySpeak = function(text){ speak(text, true); };
+window.a11yStopSpeech = function(){ try{ speechSynthesis.cancel(); }catch(e){} };
+
+/* Región assertive para avisos urgentes (la polite ya existe en la app) */
+const alertRegion = document.createElement('div');
+alertRegion.id = 'live-region-alert';
+alertRegion.className = 'sr-only';
+alertRegion.setAttribute('role','alert');
+alertRegion.setAttribute('aria-live','assertive');
+document.body.appendChild(alertRegion);
+
+const _announce = window.announce;
+window.announce = function(msg){
+  try{ _announce(msg); }catch(e){}
+  speak(msg);
+};
+
+/* ------------------------------------------------------------------
+   3. Alertas visuales y hápticas
+   ------------------------------------------------------------------ */
+const flashEl = document.createElement('div');
+flashEl.id = 'a11y-flash';
+flashEl.setAttribute('aria-hidden','true');
+document.body.appendChild(flashEl);
+
+const toastBox = document.createElement('div');
+toastBox.id = 'a11y-toasts';
+document.body.appendChild(toastBox);
+
+/* Máximo 2 destellos lentos: nunca supera los 3 Hz que pueden desencadenar
+   crisis fotosensibles, y respeta el ajuste de movimiento reducido. */
+function flash(times){
+  if(!A.flash) return;
+  let n = Math.min(times || 2, 3), i = 0;
+  const run = ()=>{
+    if(i >= n) return;
+    i++;
+    flashEl.classList.add('on');
+    setTimeout(()=>{ flashEl.classList.remove('on'); setTimeout(run, 220); }, 260);
+  };
+  run();
+}
+function vibrate(pattern){
+  if(!A.haptics) return;
+  try{ if(navigator.vibrate) navigator.vibrate(pattern); }catch(e){}
+}
+function toast(message, kind, icon){
+  const el = document.createElement('div');
+  el.className = 'a11y-toast' + (kind ? ' ' + kind : '');
+  const ico = document.createElement('span');
+  ico.className = 'ico';
+  ico.setAttribute('aria-hidden','true');
+  ico.textContent = icon || '🔔';
+  const txt = document.createElement('span');
+  txt.textContent = message;          // textContent evita cualquier inyección de HTML
+  el.appendChild(ico);
+  el.appendChild(txt);
+  toastBox.appendChild(el);
+  setTimeout(()=>{ el.style.opacity = '0'; setTimeout(()=>el.remove(), 320); }, 6000);
+}
+window.a11yToast = toast;
+
+/* Patrones de vibración distintos según el tipo de aviso, para que se
+   puedan reconocer sin mirar la pantalla ni oír nada. */
+const PATTERNS = {
+  arrival: [280,120,280,120,600],
+  finish:  [500,150,200],
+  message: [120,90,120],
+  sos:     [700,200,700,200,700],
+  info:    [160]
+};
+function notify(kind, message, icon){
+  announce(message);
+  alertRegion.textContent = message;
+  toast(message, kind === 'sos' ? 'alert' : (kind === 'finish' || kind === 'arrival' ? 'ok' : ''), icon);
+  vibrate(PATTERNS[kind] || PATTERNS.info);
+  flash(kind === 'sos' ? 3 : 2);
+}
+window.a11yNotify = notify;
+
+/* ------------------------------------------------------------------
+   4. Foco, teclado y modales accesibles
+   ------------------------------------------------------------------ */
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]), [role="button"]';
+
+function visible(el){
+  if(!el) return false;
+  if(el.closest('.hidden')) return false;
+  const r = el.getBoundingClientRect();
+  return !!(r.width || r.height) && getComputedStyle(el).visibility !== 'hidden';
+}
+function openModalEl(){
+  const mods = Array.from(document.querySelectorAll('.modal-backdrop:not(.hidden)'));
+  return mods.length ? mods[mods.length-1] : null;
+}
+function focusablesIn(container){
+  return Array.from(container.querySelectorAll(FOCUSABLE)).filter(visible);
+}
+function activeContext(){
+  return openModalEl() || document.querySelector('.screen.active') || document.body;
+}
+
+let lastFocused = null;
+const _openModal = window.openModal;
+window.openModal = function(id){
+  lastFocused = document.activeElement;
+  _openModal(id);
+  const m = document.getElementById(id);
+  if(!m) return;
+  setTimeout(()=>{
+    const f = focusablesIn(m);
+    const target = m.querySelector('h2, h3') || f[0];
+    if(target){
+      if(!target.hasAttribute('tabindex') && !f.includes(target)) target.setAttribute('tabindex','-1');
+      try{ target.focus(); }catch(e){}
+    }
+  }, 40);
+};
+const _closeModal = window.closeModal;
+window.closeModal = function(id){
+  _closeModal(id);
+  if(lastFocused && document.contains(lastFocused) && visible(lastFocused)){
+    try{ lastFocused.focus(); }catch(e){}
+  }
+  lastFocused = null;
+};
+window.a11yCloseTopModal = function(){
+  const m = openModalEl();
+  if(m && m.id) window.closeModal(m.id);
+  return !!m;
+};
+
+document.addEventListener('keydown', function(e){
+  const modal = openModalEl();
+  /* Escape cierra cualquier modal abierto */
+  if(e.key === 'Escape' && modal && modal.id){
+    window.closeModal(modal.id);
+    return;
+  }
+  /* Trampa de foco: el tabulador no se escapa del diálogo abierto */
+  if(e.key === 'Tab' && modal){
+    const f = focusablesIn(modal);
+    if(!f.length) return;
+    const first = f[0], last = f[f.length-1];
+    if(e.shiftKey && (document.activeElement === first || !modal.contains(document.activeElement))){
+      e.preventDefault(); last.focus();
+    } else if(!e.shiftKey && document.activeElement === last){
+      e.preventDefault(); first.focus();
+    }
+    return;
+  }
+  /* Atajos globales */
+  if(e.altKey && !e.ctrlKey && !e.metaKey){
+    const k = (e.key || '').toLowerCase();
+    if(k === 'a'){ e.preventDefault(); window.openModal('modal-settings'); }
+    else if(k === 'm'){ e.preventDefault(); window.a11ySet('voice', !A.voice); }
+    else if(k === 'l'){ e.preventDefault(); readScreenAloud(); }
+    else if(k === 'c'){ e.preventDefault(); window.openDriverChat && window.openDriverChat(); }
+  }
+}, true);
+
+/* Enlace para saltar al contenido principal */
+const skip = document.createElement('a');
+skip.className = 'skip-link';
+skip.href = '#';
+skip.textContent = 'Saltar al contenido principal';
+skip.addEventListener('click', function(e){
+  e.preventDefault();
+  const s = document.querySelector('.screen.active');
+  if(!s) return;
+  const h = s.querySelector('h1, h2') || s;
+  h.setAttribute('tabindex','-1');
+  h.focus();
+  h.scrollIntoView({block:'start'});
+});
+document.body.insertBefore(skip, document.body.firstChild);
+
+/* Al cambiar de pantalla, el foco viaja al encabezado y se actualiza la
+   pestaña activa de la barra inferior. */
+const _goTo = window.goTo;
+window.goTo = function(id){
+  _goTo(id);
+  const s = document.getElementById(id);
+  if(s){
+    const h = s.querySelector('h1, h2, .brand');
+    if(h){ h.setAttribute('tabindex','-1'); setTimeout(()=>{ try{ h.focus({preventScroll:true}); }catch(e){} }, 60); }
+  }
+  document.querySelectorAll('.bottom-nav button').forEach(b=>{
+    const target = (b.getAttribute('onclick')||'').match(/goTo\('([^']+)'\)/);
+    if(!target) return;
+    if(target[1] === id) b.setAttribute('aria-current','page');
+    else b.removeAttribute('aria-current');
+  });
+  updateChatButtonVisibility();
+  renderMapControls();
+  if(A.scan) restartScanning();
+};
+
+/* Lectura en voz alta del contenido de la pantalla actual */
+function readScreenAloud(){
+  const s = activeContext();
+  const text = (s.innerText || '').replace(/\s+/g,' ').trim().slice(0, 1200);
+  if(!text){ speak('No hay contenido para leer', true); return; }
+  speak(text, true);
+  toast('Leyendo la pantalla en voz alta', '', '🔊');
+}
+window.a11yReadScreen = readScreenAloud;
+
+/* ------------------------------------------------------------------
+   5. Modo barrido / switches externos
+   ------------------------------------------------------------------ */
+let scanTimer = null, scanIndex = -1, scanItems = [], scanPaused = false, lastTypedAt = 0;
+function clearScanHighlight(){
+  document.querySelectorAll('.scan-target').forEach(el=>el.classList.remove('scan-target'));
+}
+/* Mientras la persona escribe en un campo, el barrido espera: así nunca le
+   roba el foco a mitad de una palabra. */
+document.addEventListener('keydown', function(e){
+  const t = document.activeElement;
+  if(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA') && e.key.length === 1) lastTypedAt = Date.now();
+});
+function scanStep(){
+  if(scanPaused) return;
+  const act = document.activeElement;
+  const typing = act && (act.tagName === 'INPUT' || act.tagName === 'TEXTAREA') && (Date.now() - lastTypedAt < 6000);
+  if(typing) return;
+  const ctx = activeContext();
+  scanItems = focusablesIn(ctx);
+  // Los botones flotantes (accesibilidad, voz, SOS) viven fuera de las
+  // pantallas, así que se añaden al recorrido cuando no hay diálogo abierto.
+  if(!openModalEl()){
+    document.querySelectorAll('.settings-fab, .voice-fab, .emergency-fab, .skip-link').forEach(el=>{
+      if(visible(el) && !scanItems.includes(el)) scanItems.push(el);
+    });
+  }
+  if(!scanItems.length) return;
+  scanIndex = (scanIndex + 1) % scanItems.length;
+  clearScanHighlight();
+  const el = scanItems[scanIndex];
+  el.classList.add('scan-target');
+  try{ el.focus({preventScroll:false}); }catch(e){}
+  const label = el.getAttribute('aria-label') || (el.innerText||'').trim() || el.getAttribute('placeholder') || 'elemento';
+  if(A.tts) speak(label.slice(0,90), true);
+}
+function toggleScanning(on){
+  clearInterval(scanTimer); scanTimer = null;
+  if(!on){ clearScanHighlight(); return; }
+  scanIndex = -1;
+  scanTimer = setInterval(scanStep, A.scanSpeed);
+}
+function restartScanning(){ scanIndex = -1; toggleScanning(true); }
+/* Al pulsar el switch (Enter/Espacio) el barrido se detiene un momento para
+   que el elemento enfocado reciba la activación sin que el foco se mueva. */
+document.addEventListener('keydown', function(e){
+  if(!A.scan) return;
+  if(e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar'){
+    scanPaused = true;
+    clearInterval(scanTimer);
+    setTimeout(()=>{ scanPaused = false; toggleScanning(true); }, 3200);
+  }
+});
+window.a11ySetScanSpeed = function(ms){
+  A.scanSpeed = parseInt(ms,10) || 2200;
+  persist();
+  if(A.scan) restartScanning();
+  announce('Velocidad del barrido: ' + (A.scanSpeed/1000).toFixed(1) + ' segundos');
+};
+
+/* ------------------------------------------------------------------
+   6. Control por voz
+   ------------------------------------------------------------------ */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recog = null, listening = false, captionEl = null;
+
+function ensureVoiceFab(){
+  let fab = document.getElementById('voice-fab');
+  if(fab) return fab;
+  fab = document.createElement('button');
+  fab.id = 'voice-fab';
+  fab.className = 'voice-fab';
+  fab.type = 'button';
+  fab.setAttribute('aria-label','Control por voz: tocar para dictar un comando');
+  fab.innerHTML = '<span aria-hidden="true">🎤</span>';
+  fab.addEventListener('click', ()=> listening ? stopListening() : startListening());
+  document.body.appendChild(fab);
+  return fab;
+}
+function toggleVoiceUI(on){
+  const fab = document.getElementById('voice-fab');
+  if(on){
+    if(!SR){
+      const t = document.getElementById('a11y-voice');
+      if(t) t.checked = false;
+      A.voice = false;
+      toast('Este navegador no permite el control por voz. Prueba con Chrome o Edge.', 'alert', '⚠');
+      return;
+    }
+    ensureVoiceFab();
+  } else {
+    stopListening();
+    if(fab) fab.remove();
+  }
+}
+function showCaption(text){
+  if(!captionEl){
+    captionEl = document.createElement('div');
+    captionEl.className = 'voice-caption';
+    captionEl.setAttribute('role','status');
+    document.body.appendChild(captionEl);
+  }
+  captionEl.textContent = text;
+  clearTimeout(captionEl._t);
+  captionEl._t = setTimeout(()=>{ if(captionEl){ captionEl.remove(); captionEl = null; } }, 4500);
+}
+function startListening(){
+  if(!SR) return;
+  try{
+    recog = new SR();
+    recog.lang = 'es-CO';
+    recog.interimResults = false;
+    recog.maxAlternatives = 3;
+    recog.continuous = false;
+    recog.onstart = ()=>{
+      listening = true;
+      const f = document.getElementById('voice-fab');
+      if(f) f.classList.add('listening');
+      showCaption('Escuchando… di tu comando');
+      vibrate([80]);
+    };
+    recog.onresult = (ev)=>{
+      const said = (ev.results[0][0].transcript || '').toLowerCase().trim();
+      showCaption('“' + said + '”');
+      handleVoiceCommand(said);
+    };
+    recog.onerror = (ev)=>{
+      if(ev.error === 'not-allowed' || ev.error === 'service-not-allowed'){
+        toast('Debes permitir el acceso al micrófono para usar el control por voz.', 'alert', '⚠');
+      }
+    };
+    recog.onend = ()=>{
+      listening = false;
+      const f = document.getElementById('voice-fab');
+      if(f) f.classList.remove('listening');
+    };
+    recog.start();
+  }catch(e){
+    toast('No se pudo iniciar el micrófono.', 'alert', '⚠');
+  }
+}
+function stopListening(){
+  try{ if(recog) recog.stop(); }catch(e){}
+  listening = false;
+  const f = document.getElementById('voice-fab');
+  if(f) f.classList.remove('listening');
+}
+
+const COMMANDS = [
+  { re:/(ay[uú]dame|qu[eé] puedo decir|comandos)/, run:()=>{ showVoiceHelp(); } },
+  { re:/(emergencia|auxilio|s\.?o\.?s\.?|p[aá]nico)/, run:()=>{ triggerEmergency(); } },
+  { re:/(cerrar|cancelar|atr[aá]s|volver)/, run:()=>{
+      if(!window.a11yCloseTopModal()) goTo('screen-client-home');
+      announce('Cerrado');
+    } },
+  { re:/(chat|mensaje|escribir al conductor|hablar con el conductor)/, run:()=>{ window.openDriverChat(); } },
+  { re:/(historial|mis viajes|viajes anteriores)/, run:()=>goTo('screen-history') },
+  { re:/(perfil|mi cuenta|mis datos)/, run:()=>goTo('screen-profile') },
+  { re:/(inicio|pantalla principal|el mapa|volver al mapa)/, run:()=>goTo('screen-client-home') },
+  { re:/(solicitar|pedir|quiero).*(viaje|carro|veh[ií]culo|taxi|transporte)/, run:()=>{
+      if(typeof openRequestFlow === 'function') openRequestFlow();
+    } },
+  { re:/(calcular|tarifa|precio|ruta)/, run:()=>{ if(typeof calculateTrip==='function') calculateTrip(); } },
+  { re:/(confirmar|aceptar viaje|confirmo)/, run:()=>{ if(typeof confirmTrip==='function') confirmTrip(); } },
+  { re:/(modo oscuro)/, run:()=>{ if(typeof setTheme==='function') setTheme('dark'); } },
+  { re:/(modo claro)/, run:()=>{ if(typeof setTheme==='function') setTheme('light'); } },
+  { re:/(texto|letra).*(m[aá]s grande|aumentar|grande)/, run:()=>window.a11yFontStep(0.1) },
+  { re:/(texto|letra).*(m[aá]s peque|reducir|peque)/, run:()=>window.a11yFontStep(-0.1) },
+  { re:/(leer|l[eé]eme).*(pantalla|esto|contenido)/, run:()=>readScreenAloud() },
+  { re:/(accesibilidad|ajustes|configuraci[oó]n)/, run:()=>window.openModal('modal-settings') },
+  { re:/^(?:ll[eé]vame a|vamos a|ir hasta|destino|quiero ir a)\s+(.{3,})$/, run:(m)=>setDestinationByVoice(m[1]) }
+];
+
+function handleVoiceCommand(said){
+  // El destino dictado se evalúa primero para no confundirlo con la navegación.
+  const destMatch = said.match(/^(?:ll[eé]vame a|vamos a|ir hasta|destino|quiero ir a)\s+(.{3,})$/);
+  if(destMatch){ setDestinationByVoice(destMatch[1]); return; }
+  for(const c of COMMANDS){
+    const m = said.match(c.re);
+    if(m){ try{ c.run(m); }catch(e){ console.warn(e); } return; }
+  }
+  toast('No entendí “' + said + '”. Di “ayúdame” para ver los comandos.', '', '🎤');
+  announce('No entendí el comando');
+}
+
+async function setDestinationByVoice(text){
+  const clean = text.replace(/[.,;]+$/,'').trim();
+  try{
+    if(typeof openRequestFlow === 'function') openRequestFlow();
+    const input = document.getElementById('dest-address');
+    if(!input) return;
+    input.value = clean;
+    announce('Buscando ' + clean);
+    if(typeof geocodeAddress === 'function'){
+      const geo = await geocodeAddress(clean);
+      if(geo && typeof addrAutocomplete !== 'undefined'){
+        addrAutocomplete['dest-address'].selected = geo;
+        notify('info', 'Destino fijado: ' + clean + '. Di “calcular ruta” para continuar.', '📍');
+        return;
+      }
+    }
+    toast('Escribí “' + clean + '” como destino. Revísalo antes de calcular la ruta.', '', '📍');
+  }catch(e){ console.warn(e); }
+}
+
+function showVoiceHelp(){
+  const list = [
+    '“Solicitar un viaje”', '“Llévame a Centro Comercial Andino”', '“Calcular ruta”',
+    '“Confirmar”', '“Chat con el conductor”', '“Historial”', '“Perfil”',
+    '“Inicio”', '“Cancelar”', '“Emergencia”', '“Modo oscuro”', '“Texto más grande”', '“Leer pantalla”'
+  ];
+  toast('Comandos: ' + list.join(' · '), '', '🎤');
+  speak('Puedes decir: ' + list.join(', ').replace(/“|”/g,''), true);
+}
+window.a11yVoiceHelp = showVoiceHelp;
+
+/* ------------------------------------------------------------------
+   7. Controles de mapa sin gestos complejos
+   (sustituyen pellizcar para hacer zoom y arrastrar con dos dedos)
+   ------------------------------------------------------------------ */
+function renderMapControls(){
+  document.querySelectorAll('.map-a11y-controls').forEach(el=>el.remove());
+  if(!A.mapControls) return;
+  document.querySelectorAll('.map-wrap').forEach(wrap=>{
+    const mapEl = wrap.querySelector('#map, #map-tracking');
+    if(!mapEl) return;
+    const which = mapEl.id === 'map' ? 'main' : 'track';
+    const box = document.createElement('div');
+    box.className = 'map-a11y-controls';
+    box.innerHTML =
+      '<button type="button" aria-label="Acercar el mapa"><span aria-hidden="true">＋</span></button>' +
+      '<button type="button" aria-label="Alejar el mapa"><span aria-hidden="true">－</span></button>' +
+      '<button type="button" aria-label="Centrar el mapa en mi ubicación"><span aria-hidden="true">◎</span></button>';
+    const [zin, zout, center] = box.querySelectorAll('button');
+    const getMap = ()=> which === 'main'
+      ? (typeof map !== 'undefined' ? map : null)
+      : (typeof trackMap !== 'undefined' ? trackMap : null);
+    zin.addEventListener('click', ()=>{ const m = getMap(); if(m){ m.zoomIn(); announce('Mapa acercado'); } });
+    zout.addEventListener('click', ()=>{ const m = getMap(); if(m){ m.zoomOut(); announce('Mapa alejado'); } });
+    center.addEventListener('click', ()=>{
+      const m = getMap();
+      if(m && typeof userLatLng !== 'undefined' && userLatLng){
+        m.setView([userLatLng.lat, userLatLng.lng], 15);
+        announce('Mapa centrado en tu ubicación');
+      }
+    });
+    wrap.appendChild(box);
+  });
+}
+
+/* Alternativa por teclado para elegir el destino en el mapa: el contenedor
+   es enfocable y responde a Enter, sin necesidad de tocar la pantalla. */
+function makeMapKeyboardFriendly(){
+  ['map','map-tracking'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el || el.dataset.a11yReady) return;
+    el.dataset.a11yReady = '1';
+    el.setAttribute('tabindex','0');
+    if(id === 'map'){
+      el.setAttribute('aria-label','Mapa interactivo. Usa las flechas para desplazarte, más y menos para el zoom, y los botones de la esquina inferior derecha si prefieres no usar gestos.');
+    }
+  });
+}
+
+/* ------------------------------------------------------------------
+   8. Chat con el conductor
+   ------------------------------------------------------------------ */
+let chatMessages = [];
+let chatUnread = 0;
+let chatReplyTimer = null;
+
+const QUICK_PHRASES = [
+  'Ya salgo, espérame un momento',
+  'Estoy en la puerta principal',
+  'Uso silla de ruedas, necesito la rampa',
+  'Necesito ayuda para subir al vehículo',
+  'Viajo con mi animal de compañía',
+  'No puedo hablar por teléfono, escríbeme aquí',
+  '¿Cuánto falta para que llegues?',
+  'Gracias'
+];
+
+function nowTime(){
+  return new Date().toLocaleTimeString('es-CO', {hour:'2-digit', minute:'2-digit'});
+}
+function driverName(){
+  try{
+    if(typeof activeRide !== 'undefined' && activeRide && activeRide.driver) return activeRide.driver.name;
+  }catch(e){}
+  return 'Conductor';
+}
+window.resetDriverChat = function(){
+  chatMessages = [];
+  chatUnread = 0;
+  pushMessage('system', 'Chat abierto con ' + driverName() + '. Escribe aquí si prefieres no hablar por teléfono.');
+  setTimeout(()=>{
+    receiveDriverMessage('¡Hola! Soy ' + driverName() + '. Voy en camino, cualquier indicación escríbemela por aquí.');
+  }, 2200);
+  updateChatButtonVisibility();
+};
+function pushMessage(who, text){
+  chatMessages.push({who, text, time: nowTime()});
+  renderChat();
+}
+function renderChat(){
+  const log = document.getElementById('chat-log');
+  if(!log) return;
+  log.innerHTML = chatMessages.map(m=>{
+    if(m.who === 'system'){
+      return '<div class="chat-msg system">' + escapeHtml(m.text) + '</div>';
+    }
+    const cls = m.who === 'me' ? 'me' : 'driver';
+    const label = m.who === 'me' ? 'Tú' : escapeHtml(driverName());
+    return '<div class="chat-msg ' + cls + '"><span class="who">' + label + '</span>' +
+           escapeHtml(m.text) + '<span class="time">' + m.time + '</span></div>';
+  }).join('');
+  log.scrollTop = log.scrollHeight;
+}
+function receiveDriverMessage(text){
+  pushMessage('driver', text);
+  const open = !document.getElementById('modal-chat').classList.contains('hidden');
+  if(!open){
+    chatUnread++;
+    updateChatButtonVisibility();
+    notify('message', 'Nuevo mensaje de ' + driverName() + ': ' + text, '💬');
+  } else {
+    vibrate(PATTERNS.message);
+    announce(driverName() + ' dice: ' + text);
+  }
+  const typing = document.getElementById('chat-typing');
+  if(typing) typing.textContent = '';
+}
+
+/* Respuestas simuladas del conductor (la app es un prototipo académico y no
+   hay un conductor real conectado al otro lado). */
+const REPLIES = [
+  { re:/(rampa|silla|ruedas)/, say:'Perfecto, mi vehículo tiene rampa. La preparo antes de llegar.' },
+  { re:/(ayuda|subir|bajar|abordar)/, say:'Claro que sí, te ayudo a subir y bajar sin problema.' },
+  { re:/(mascota|animal|perro|gato|gu[ií]a)/, say:'Sin problema, el vehículo es pet friendly.' },
+  { re:/(cu[aá]nto|falta|demora|tiempo|llegas)/, say:'Voy a unos minutos de ti, ya casi llego.' },
+  { re:/(puerta|entrada|esquina|afuera|salgo|espera)/, say:'Entendido, te espero ahí. No te preocupes.' },
+  { re:/(no puedo hablar|sordo|escrib|se[ñn]as|audici[oó]n)/, say:'Tranquilo, nos comunicamos solo por aquí. Te aviso por escrito cuando llegue.' },
+  { re:/(gracias|listo|ok|vale)/, say:'Con mucho gusto. 🙂' }
+];
+function autoReply(userText){
+  clearTimeout(chatReplyTimer);
+  const typing = document.getElementById('chat-typing');
+  if(typing) typing.textContent = driverName() + ' está escribiendo…';
+  const t = userText.toLowerCase();
+  const found = REPLIES.find(r=>r.re.test(t));
+  const say = found ? found.say : 'Entendido, gracias por avisarme.';
+  chatReplyTimer = setTimeout(()=>receiveDriverMessage(say), 1400 + Math.random()*1400);
+}
+
+window.openDriverChat = function(){
+  const modal = document.getElementById('modal-chat');
+  if(!modal) return;
+  if(typeof activeRide === 'undefined' || !activeRide){
+    toast('El chat se activa cuando tengas un viaje en curso.', '', '💬');
+    announce('El chat estará disponible durante el viaje');
+    return;
+  }
+  if(!chatMessages.length) window.resetDriverChat();
+  chatUnread = 0;
+  updateChatButtonVisibility();
+  window.openModal('modal-chat');
+  renderChat();
+  setTimeout(()=>{ const i = document.getElementById('chat-input'); if(i) i.focus(); }, 120);
+};
+window.sendChatMessage = function(text){
+  const input = document.getElementById('chat-input');
+  const value = (text !== undefined ? text : (input ? input.value : '')).trim();
+  if(!value) return false;
+  pushMessage('me', value);
+  if(input && text === undefined) input.value = '';
+  announce('Mensaje enviado');
+  vibrate([60]);
+  autoReply(value);
+  saveChatToCloud(value);
+  return false;
+};
+window.chatQuickSend = function(phrase){ window.sendChatMessage(phrase); };
+window.chatReadLast = function(){
+  const last = [...chatMessages].reverse().find(m=>m.who === 'driver');
+  if(!last){ speak('Todavía no hay mensajes del conductor', true); return; }
+  speak(driverName() + ' dice: ' + last.text, true);
+};
+function saveChatToCloud(text){
+  try{
+    if(typeof session === 'undefined' || !session || !session.uid) return;
+    db.collection(USERS_COLLECTION).doc(session.uid).collection('mensajes').add({
+      texto: text,
+      conductor: driverName(),
+      creadoEn: serverTimestamp()
+    }).catch(()=>{});
+  }catch(e){}
+}
+function updateChatButtonVisibility(){
+  const btn = document.getElementById('btn-open-chat');
+  if(!btn) return;
+  const badge = document.getElementById('chat-unread');
+  if(badge){
+    badge.textContent = chatUnread ? String(chatUnread) : '';
+    badge.style.display = chatUnread ? 'inline-flex' : 'none';
+  }
+  btn.setAttribute('aria-label', 'Abrir chat con el conductor' + (chatUnread ? ', ' + chatUnread + ' mensajes sin leer' : ''));
+}
+
+/* Rellena las frases rápidas del chat */
+function buildQuickPhrases(){
+  const box = document.getElementById('chat-quick');
+  if(!box || box.dataset.ready) return;
+  box.dataset.ready = '1';
+  box.innerHTML = QUICK_PHRASES.map(p=>
+    '<button type="button" onclick="chatQuickSend(this.dataset.p)" data-p="' + escapeHtml(p) + '">' + escapeHtml(p) + '</button>'
+  ).join('');
+}
+
+/* ------------------------------------------------------------------
+   9. Enganches con el flujo del viaje (sin tocar su lógica)
+   ------------------------------------------------------------------ */
+/* Al confirmar un viaje se reinicia el chat con el conductor elegido. */
+if(typeof window.confirmTrip === 'function'){
+  const _confirmTrip = window.confirmTrip;
+  window.confirmTrip = function(){
+    const r = _confirmTrip.apply(this, arguments);
+    setTimeout(()=>{
+      if(typeof activeRide !== 'undefined' && activeRide){
+        window.resetDriverChat();
+        notify('info', 'Viaje confirmado con ' + driverName(), '✅');
+        makeMapKeyboardFriendly();
+        renderMapControls();
+      }
+    }, 120);
+    return r;
+  };
+}
+/* El botón SOS suma aviso visual y háptico al comportamiento original. */
+if(typeof window.triggerEmergency === 'function'){
+  const _triggerEmergency = window.triggerEmergency;
+  window.triggerEmergency = function(){
+    const r = _triggerEmergency.apply(this, arguments);
+    notify('sos', 'Alerta de emergencia activada. Tu contacto de confianza fue notificado.', '🆘');
+    return r;
+  };
+}
+/* Observa el estado del viaje para lanzar la alerta multisensorial cuando el
+   vehículo llega y cuando el viaje termina. */
+function watchTripStatus(){
+  const el = document.getElementById('tracking-status');
+  if(!el || el.dataset.a11yWatched) return;
+  el.dataset.a11yWatched = '1';
+  let last = '';
+  new MutationObserver(()=>{
+    const txt = (el.textContent || '').trim();
+    if(txt === last) return;
+    last = txt;
+    if(/a bordo/i.test(txt)){
+      notify('arrival', 'Tu vehículo ha llegado. El conductor te está esperando.', '🚐');
+    } else if(/has llegado/i.test(txt)){
+      notify('finish', 'Has llegado a tu destino.', '🎉');
+    }
+  }).observe(el, {childList:true, characterData:true, subtree:true});
+}
+
+/* ------------------------------------------------------------------
+   10. Etiquetado ARIA de elementos generados dinámicamente
+   ------------------------------------------------------------------ */
+function labelDynamicContent(){
+  // Tarjetas de conductor creadas por innerHTML: se asegura texto alternativo
+  document.querySelectorAll('.driver-card').forEach(card=>{
+    if(card.dataset.a11yLabelled) return;
+    card.dataset.a11yLabelled = '1';
+    if(!card.getAttribute('role')) card.setAttribute('role','group');
+    if(!card.getAttribute('aria-label')){
+      const name = card.querySelector('strong');
+      if(name) card.setAttribute('aria-label','Conductor ' + name.textContent);
+    }
+  });
+  document.querySelectorAll('.driver-avatar img').forEach(img=>{
+    if(!img.getAttribute('alt')) img.setAttribute('alt','Foto del conductor');
+  });
+  document.querySelectorAll('.stat-tile').forEach(tile=>{
+    if(tile.dataset.a11yLabelled) return;
+    tile.dataset.a11yLabelled = '1';
+    const num = tile.querySelector('.num'), lbl = tile.querySelector('.lbl');
+    if(num && lbl){
+      tile.setAttribute('role','group');
+      tile.setAttribute('aria-label', num.textContent + ' ' + lbl.textContent);
+    }
+  });
+}
+new MutationObserver(()=>{
+  labelDynamicContent();
+  watchTripStatus();
+  makeMapKeyboardFriendly();
+}).observe(document.body, {childList:true, subtree:true});
+
+/* ------------------------------------------------------------------
+   11. Preferencias guardadas en el perfil del usuario
+   ------------------------------------------------------------------ */
+if(typeof window.applyProfilePreferences === 'function'){
+  const _applyProfilePrefs = window.applyProfilePreferences;
+  window.applyProfilePreferences = function(profile){
+    _applyProfilePrefs(profile);
+    try{
+      const saved = profile && profile.preferencias && profile.preferencias.accesibilidad;
+      if(saved && typeof saved === 'object'){
+        A = Object.assign({}, DEFAULTS, saved);
+        try{ localStorage.setItem(STORE_KEY, JSON.stringify(A)); }catch(e){}
+        applyAll();
+      }
+    }catch(e){ console.warn('No se pudieron aplicar las preferencias de accesibilidad:', e); }
+  };
+}
+
+/* ------------------------------------------------------------------
+   12. Arranque
+   ------------------------------------------------------------------ */
+function init(){
+  loadPrefs();
+  applyAll();
+  buildQuickPhrases();
+  labelDynamicContent();
+  makeMapKeyboardFriendly();
+  watchTripStatus();
+  updateChatButtonVisibility();
+}
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+})();
+</script>
+
 </body>
 </html>
