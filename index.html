@@ -9,6 +9,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>AccessRide Colombia — Transporte accesible</title>
+<link rel="icon" type="image/svg+xml" href="Images/favicon.svg">
+<link rel="apple-touch-icon" href="Images/favicon.svg">
+<link rel="mask-icon" href="Images/Logo.svg" color="#0F766E">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 
@@ -668,9 +671,18 @@ kbd{
 .a11y-toast{
   pointer-events:auto; background:var(--bg-elevated); color:var(--text-primary);
   border:2px solid var(--accent-primary); border-left-width:8px; border-radius:var(--radius-sm);
-  padding:.9em 1.1em; box-shadow:var(--shadow-lg); font-weight:700;
+  padding:.9em .6em .9em 1.1em; box-shadow:var(--shadow-lg); font-weight:700;
   display:flex; align-items:center; gap:.7em; animation:toastIn .25s var(--ease);
+  transition:opacity .3s ease;
 }
+.a11y-toast .msg{ flex:1; min-width:0; }
+.a11y-toast-close{
+  flex:none; width:var(--hit); height:var(--hit); min-width:var(--hit);
+  background:transparent; border:none; border-radius:10px;
+  color:var(--text-muted); font-size:1.1rem; font-weight:800; line-height:1;
+  display:flex; align-items:center; justify-content:center;
+}
+.a11y-toast-close:hover{ background:var(--bg-tertiary); color:var(--text-primary); }
 .a11y-toast.alert{ border-color:var(--accent-danger); }
 .a11y-toast.ok{ border-color:var(--accent-success); }
 .a11y-toast .ico{ font-size:1.4rem; flex:none; }
@@ -770,6 +782,38 @@ kbd{
   .topbar .logo-mark{ width:46px; height:22px; }
 }
 
+/* ==============================================================================
+   TECLADO EN PANTALLA (móvil): que nunca tape el campo activo
+   --vvh = alto real visible, --kb = alto que ocupa el teclado. Los calcula
+   el módulo JS con visualViewport y aquí se usan para que los diálogos se
+   ajusten al área que de verdad se ve en vez de quedar bajo el teclado.
+   ============================================================================== */
+.modal-backdrop{
+  height:var(--vvh, 100%);
+  align-items:flex-end;
+}
+.modal, .settings-panel{
+  max-height:calc(var(--vvh, 88vh) - 1.2em);
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+/* Con el teclado abierto el diálogo se pega arriba y deja hueco al final,
+   para que el último campo y los botones queden siempre alcanzables. */
+html.kb-open .modal-backdrop{ align-items:flex-start; }
+html.kb-open .modal, html.kb-open .settings-panel{
+  border-radius:var(--radius);
+  margin-top:.5em;
+  padding-bottom:calc(1.6em + 5.5em);
+}
+@media (min-width:700px){
+  .modal-backdrop{ align-items:center; }
+  html.kb-open .modal-backdrop{ align-items:center; }
+}
+/* Deja aire al desplazar un campo a la vista, para que no quede pegado al borde */
+input, select, textarea, .addr-field, .btn{ scroll-margin:6em 0; }
+/* El desplegable de direcciones nunca debe quedar debajo del teclado */
+.addr-suggestions{ max-height:min(280px, calc(var(--vvh, 100vh) * 0.38)); }
+
 </style>
 </head>
 <body>
@@ -808,13 +852,6 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err=>{
 <section id="screen-landing" class="screen active" aria-label="Bienvenida">
   <div class="landing">
     <div class="landing-inner">
-      <div class="theme-toggle-wrap">
-        <button class="theme-toggle" onclick="toggleTheme()" aria-label="Cambiar entre modo claro y oscuro">
-          <span id="theme-icon">🌙</span>
-          <span id="theme-label">Modo oscuro</span>
-        </button>
-      </div>
-
       <div class="brand-hero">
 <span class="logo-mark" role="img" aria-label="Logo AccessRide Colombia"></span>
         <div>
@@ -3009,11 +3046,26 @@ function toast(message, kind, icon){
   ico.setAttribute('aria-hidden','true');
   ico.textContent = icon || '🔔';
   const txt = document.createElement('span');
+  txt.className = 'msg';
   txt.textContent = message;          // textContent evita cualquier inyección de HTML
-  el.appendChild(ico);
-  el.appendChild(txt);
+  const close = document.createElement('button');
+  close.type = 'button';
+  close.className = 'a11y-toast-close';
+  close.setAttribute('aria-label', 'Cerrar notificación');
+  close.textContent = '✕';
+  let gone = false;
+  const dismiss = ()=>{
+    if(gone) return;
+    gone = true;
+    clearTimeout(timer);
+    el.style.opacity = '0';
+    setTimeout(()=>el.remove(), 320);
+  };
+  close.addEventListener('click', dismiss);
+  el.append(ico, txt, close);
   toastBox.appendChild(el);
-  setTimeout(()=>{ el.style.opacity = '0'; setTimeout(()=>el.remove(), 320); }, 6000);
+  const timer = setTimeout(dismiss, 8000);
+  return dismiss;
 }
 window.a11yToast = toast;
 
@@ -3042,9 +3094,12 @@ const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([t
 
 function visible(el){
   if(!el) return false;
+  // offsetParent es nulo para todo lo que está en display:none: es la
+  // comprobación más barata, así evitamos getComputedStyle casi siempre.
+  if(el.offsetParent === null && getComputedStyle(el).position !== 'fixed') return false;
   if(el.closest('.hidden')) return false;
   const r = el.getBoundingClientRect();
-  return !!(r.width || r.height) && getComputedStyle(el).visibility !== 'hidden';
+  return !!(r.width || r.height);
 }
 function openModalEl(){
   const mods = Array.from(document.querySelectorAll('.modal-backdrop:not(.hidden)'));
@@ -3162,6 +3217,45 @@ function readScreenAloud(){
   toast('Leyendo la pantalla en voz alta', '', '🔊');
 }
 window.a11yReadScreen = readScreenAloud;
+
+/* ------------------------------------------------------------------
+   4.bis Teclado en pantalla: que nunca tape el campo activo
+   En móvil el teclado no reduce el viewport de diseño, así que un modal
+   anclado abajo queda escondido detrás. Se mide el viewport *visual* y se
+   expone como variables CSS para que los diálogos se ajusten al área que
+   de verdad se ve, y el campo enfocado se desplaza a la vista.
+   ------------------------------------------------------------------ */
+const vv = window.visualViewport;
+function syncViewport(){
+  const root = document.documentElement;
+  if(!vv){ root.style.setProperty('--vvh', window.innerHeight + 'px'); return; }
+  const h = Math.round(vv.height);
+  // Diferencia entre el alto de la ventana y el área visible = teclado
+  const kb = Math.max(0, Math.round(window.innerHeight - h - vv.offsetTop));
+  root.style.setProperty('--vvh', h + 'px');
+  root.style.setProperty('--kb', kb + 'px');
+  root.classList.toggle('kb-open', kb > 120);
+}
+if(vv){
+  vv.addEventListener('resize', syncViewport);
+  vv.addEventListener('scroll', syncViewport);
+}
+window.addEventListener('resize', syncViewport);
+window.addEventListener('orientationchange', ()=>setTimeout(syncViewport, 250));
+syncViewport();
+
+/* Al enfocar un campo, se lo lleva al centro del área visible. El retardo
+   deja que el teclado termine de abrirse antes de calcular la posición. */
+let scrollFocusTimer = null;
+document.addEventListener('focusin', function(e){
+  const t = e.target;
+  if(!t || !/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
+  if(t.type === 'checkbox' || t.type === 'radio' || t.type === 'range') return;
+  clearTimeout(scrollFocusTimer);
+  scrollFocusTimer = setTimeout(()=>{
+    try{ t.scrollIntoView({block:'center', behavior:'smooth'}); }catch(err){ }
+  }, 320);
+});
 
 /* ------------------------------------------------------------------
    5. Modo barrido / switches externos
@@ -3530,7 +3624,9 @@ window.openDriverChat = function(){
   updateChatButtonVisibility();
   window.openModal('modal-chat');
   renderChat();
-  setTimeout(()=>{ const i = document.getElementById('chat-input'); if(i) i.focus(); }, 120);
+  /* No se enfoca el campo de texto a propósito: en el celular eso abriría el
+     teclado de inmediato y taparía las frases rápidas. El teclado aparece
+     solo cuando la persona toca el cuadro de texto. */
 };
 window.sendChatMessage = function(text){
   const input = document.getElementById('chat-input');
@@ -3632,9 +3728,9 @@ function watchTripStatus(){
    10. Etiquetado ARIA de elementos generados dinámicamente
    ------------------------------------------------------------------ */
 function labelDynamicContent(){
-  // Tarjetas de conductor creadas por innerHTML: se asegura texto alternativo
-  document.querySelectorAll('.driver-card').forEach(card=>{
-    if(card.dataset.a11yLabelled) return;
+  /* Los selectores :not([data-a11y-labelled]) dejan que el navegador filtre
+     los elementos ya procesados, en vez de recorrerlos todos desde JS. */
+  document.querySelectorAll('.driver-card:not([data-a11y-labelled])').forEach(card=>{
     card.dataset.a11yLabelled = '1';
     if(!card.getAttribute('role')) card.setAttribute('role','group');
     if(!card.getAttribute('aria-label')){
@@ -3642,11 +3738,10 @@ function labelDynamicContent(){
       if(name) card.setAttribute('aria-label','Conductor ' + name.textContent);
     }
   });
-  document.querySelectorAll('.driver-avatar img').forEach(img=>{
-    if(!img.getAttribute('alt')) img.setAttribute('alt','Foto del conductor');
+  document.querySelectorAll('.driver-avatar img:not([alt])').forEach(img=>{
+    img.setAttribute('alt','Foto del conductor');
   });
-  document.querySelectorAll('.stat-tile').forEach(tile=>{
-    if(tile.dataset.a11yLabelled) return;
+  document.querySelectorAll('.stat-tile:not([data-a11y-labelled])').forEach(tile=>{
     tile.dataset.a11yLabelled = '1';
     const num = tile.querySelector('.num'), lbl = tile.querySelector('.lbl');
     if(num && lbl){
@@ -3655,11 +3750,21 @@ function labelDynamicContent(){
     }
   });
 }
-new MutationObserver(()=>{
-  labelDynamicContent();
-  watchTripStatus();
-  makeMapKeyboardFriendly();
-}).observe(document.body, {childList:true, subtree:true});
+/* Un solo observador para todo el documento, agrupado por frame: sin esto
+   cada cambio del DOM (progreso del viaje, listas, toasts) dispararía el
+   recorrido completo varias veces por segundo. */
+let domScanQueued = false;
+function scheduleDomScan(){
+  if(domScanQueued) return;
+  domScanQueued = true;
+  requestAnimationFrame(()=>{
+    domScanQueued = false;
+    labelDynamicContent();
+    watchTripStatus();
+    makeMapKeyboardFriendly();
+  });
+}
+new MutationObserver(scheduleDomScan).observe(document.body, {childList:true, subtree:true});
 
 /* ------------------------------------------------------------------
    11. Preferencias guardadas en el perfil del usuario
