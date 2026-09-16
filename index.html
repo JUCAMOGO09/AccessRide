@@ -984,6 +984,42 @@ const DRIVER_TEMPLATES = [
     adaptations:["visual","auditiva","ayuda"], pet:false},
   {name:"Diana Torres", rating:4.85, vehicle:"Camioneta amplia", plate:"AMP-330",
     adaptations:["espacio","elevador","fijacion","ayuda"], pet:true},
+  {name:"Julián Mendoza", rating:4.65, vehicle:"Van con rampa", plate:"JMD-104",
+    adaptations:["rampa","fijacion"], pet:false},
+  {name:"Paola Restrepo", rating:4.75, vehicle:"Camioneta espaciosa", plate:"PRT-220",
+    adaptations:["espacio","ayuda","visual"], pet:true},
+  {name:"Sebastián Castro", rating:4.55, vehicle:"Taxi con elevador", plate:"SCT-337",
+    adaptations:["elevador","auditiva"], pet:false},
+  {name:"Natalia Duarte", rating:4.95, vehicle:"Van Pet Friendly", plate:"NDT-455",
+    adaptations:["rampa","espacio","fijacion","ayuda"], pet:true},
+  {name:"Ricardo Molina", rating:4.6, vehicle:"Sedán amplio", plate:"RML-512",
+    adaptations:["visual","ayuda"], pet:false},
+  {name:"Camila Vargas", rating:4.8, vehicle:"Camioneta adaptada", plate:"CVG-628",
+    adaptations:["rampa","elevador","espacio"], pet:false},
+  {name:"Esteban Rojas", rating:4.7, vehicle:"Van amplia", plate:"ERJ-741",
+    adaptations:["espacio","fijacion","auditiva"], pet:true},
+  {name:"Daniela Ortiz", rating:4.9, vehicle:"Taxi Pet Friendly", plate:"DOR-859",
+    adaptations:["rampa","ayuda"], pet:true},
+  {name:"Miguel Ángel Herrera", rating:4.5, vehicle:"Camioneta con rampa", plate:"MHR-963",
+    adaptations:["rampa","visual","ayuda"], pet:false},
+  {name:"Valentina Cárdenas", rating:4.85, vehicle:"Van con elevador", plate:"VCD-071",
+    adaptations:["elevador","fijacion","espacio"], pet:false},
+  {name:"Felipe Guzmán", rating:4.65, vehicle:"Sedán adaptado", plate:"FGZ-184",
+    adaptations:["auditiva","ayuda"], pet:true},
+  {name:"Alejandra Prieto", rating:4.9, vehicle:"Camioneta amplia", plate:"APR-296",
+    adaptations:["espacio","rampa","visual","auditiva"], pet:false},
+  {name:"Santiago Beltrán", rating:4.6, vehicle:"Van Adaptada", plate:"SBL-308",
+    adaptations:["rampa","fijacion","ayuda"], pet:false},
+  {name:"Manuela Cifuentes", rating:4.75, vehicle:"Taxi con espacio amplio", plate:"MCF-419",
+    adaptations:["espacio","ayuda"], pet:true},
+  {name:"Tomás Aguilar", rating:4.55, vehicle:"Camioneta con elevador", plate:"TAG-527",
+    adaptations:["elevador","visual"], pet:false},
+  {name:"Isabella Correa", rating:4.95, vehicle:"Van Pet Friendly", plate:"ICR-636",
+    adaptations:["rampa","espacio","ayuda"], pet:true},
+  {name:"Nicolás Fajardo", rating:4.7, vehicle:"Sedán amplio", plate:"NFJ-748",
+    adaptations:["auditiva","fijacion"], pet:false},
+  {name:"Laura Escobar", rating:4.8, vehicle:"Camioneta adaptada", plate:"LES-852",
+    adaptations:["rampa","elevador","ayuda","visual"], pet:true},
 ];
 
 const ADAPTATION_LABELS = {
@@ -1469,11 +1505,29 @@ function jitter(base, meters){
   return base + (Math.random()*2-1)*deg;
 }
 
+/* Mezcla el arreglo (Fisher-Yates) para que la selección de conductores
+   cercanos y el ganador de la recomendación no dependan siempre del mismo
+   orden de la lista original. */
+function shuffleArray(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+const NEARBY_DRIVERS_COUNT = 8;
+
 let generatedDrivers = [];
 function placeNearbyDrivers(){
   driverMarkers.forEach(m=>map.removeLayer(m));
   driverMarkers = [];
-  generatedDrivers = DRIVER_TEMPLATES.map((t,i)=>{
+  // Cada vez que entras al mapa se sortea un subconjunto distinto de la
+  // lista completa de conductores, así "cercanos" cambia entre sesiones
+  // en vez de mostrar siempre los mismos nombres en el mismo orden.
+  const pickedTemplates = shuffleArray(DRIVER_TEMPLATES).slice(0, NEARBY_DRIVERS_COUNT);
+  generatedDrivers = pickedTemplates.map((t,i)=>{
     const lat = jitter(userLatLng.lat, 400 + i*180);
     const lng = jitter(userLatLng.lng, 400 + i*180);
     const distance = haversine(userLatLng.lat, userLatLng.lng, lat, lng);
@@ -1876,7 +1930,12 @@ function formatCOP(n){
   return "$"+Math.round(n).toLocaleString('es-CO')+" COP";
 }
 
-/* Compatibility + matching algorithm */
+/* Compatibility + matching algorithm.
+   El puntaje de compatibilidad sigue siendo la base (rampa/elevador, apoyo
+   visual/auditivo, mascota, distancia, calificación), pero se le suma un
+   pequeño factor aleatorio para que, entre varios conductores igualmente
+   compatibles, no gane siempre el mismo. Así "recomendado" varía de una
+   solicitud a otra en vez de converger siempre en un único nombre. */
 function rankDrivers(client, drivers){
   const needsRampOrLift = ['silla_manual','silla_electrica'].includes(client.tipo) || client.espacioSilla;
   const needsVisual = client.tipo==='visual';
@@ -1902,6 +1961,9 @@ function rankDrivers(client, drivers){
     reasons.push(`Está a solo ${d.distance.toFixed(1)} km de ti.`);
     score += (d.rating-4.5)*10;
     reasons.push(`Calificación de ${d.rating.toFixed(1)} estrellas.`);
+    // Ruido aleatorio pequeño: no cambia quién es claramente el mejor
+    // candidato, pero desempata entre conductores con puntajes parecidos.
+    score += Math.random()*8;
     return {...d, score, reasons};
   });
 
