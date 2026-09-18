@@ -229,8 +229,33 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent-primary); box-
 [data-theme="dark"] .segmented button[aria-selected="true"]{color:#0B1120;}
 
 /* ===================== MAP SCREEN ===================== */
-.map-wrap{position:relative; height:56vh; min-height:340px; border-radius:0 0 var(--radius) var(--radius); overflow:hidden;}
+/* z-index bajo y explícito: el mapa (y todo lo que Leaflet dibuja dentro,
+   como sus propios controles y la atribución) debe quedar SIEMPRE por debajo
+   de cualquier modal, sheet, panel de ajustes o aviso de la interfaz. Sin
+   esto, el contexto de apilamiento interno de Leaflet (z-index:1000 en sus
+   controles) competía contra elementos con z-index menor y se sobreponía
+   a pantallas como "Solicitar viaje" o "Ajustes de accesibilidad".
+   isolation:isolate crea un nuevo contexto de apilamiento en .map-wrap: así
+   TODO lo de adentro (tiles, marcadores, popups y controles de Leaflet,
+   cada uno con su z-index interno relativo intacto) queda contenido y no
+   puede competir con elementos fuera del mapa, sin necesidad de tocar los
+   z-index internos de Leaflet uno por uno. */
+.map-wrap{position:relative; height:56vh; min-height:340px; border-radius:0 0 var(--radius) var(--radius); overflow:hidden; z-index:1; isolation:isolate;}
 #map{height:100%; width:100%;}
+/* Los controles de zoom nativos de Leaflet se ocultan: la app ya ofrece sus
+   propios botones grandes de acercar/alejar/centrar en .map-a11y-controls,
+   pensados para móvil. Mostrar los dos duplicaba los botones de zoom y
+   hacía que se superpusieran entre sí y con el resto de controles. */
+.leaflet-control-zoom{ display:none !important; }
+/* La atribución de OpenStreetMap se mantiene (es obligatoria), pero se
+   ancla dentro del propio mapa, compacta y sin invadir otras interfaces. */
+.leaflet-control-attribution{
+  font-size:.62rem !important; line-height:1.2; padding:.15em .5em !important;
+  background:color-mix(in srgb, var(--bg-secondary) 82%, transparent) !important;
+  color:var(--text-muted) !important; border-radius:8px 0 0 0 !important;
+  max-width:72vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.leaflet-control-attribution a{ color:var(--text-muted) !important; }
 .address-bar{
   display:flex; align-items:center; gap:.7em; padding:1em 1.2em; background:var(--bg-secondary); border-bottom:1px solid var(--border);
 }
@@ -711,7 +736,12 @@ kbd{
 
 /* ---------- 8. CONTROLES DE MAPA SIN GESTOS COMPLEJOS ---------- */
 .map-a11y-controls{
-  position:absolute; right:10px; bottom:34px; z-index:1000;
+  /* z-index alto para quedar por ENCIMA de las capas internas de Leaflet
+     (tiles, marcadores, popups y su atribución, que dentro de .map-wrap
+     llegan hasta ~700), pero sigue acotado al contexto de apilamiento
+     aislado de .map-wrap: nunca puede superar a un modal, sheet o panel
+     del resto de la app, gracias a isolation:isolate en .map-wrap. */
+  position:absolute; right:10px; bottom:34px; z-index:750;
   display:flex; flex-direction:column; gap:.4em;
 }
 .map-a11y-controls button{
@@ -1808,6 +1838,52 @@ const DRIVER_TEMPLATES = [
     adaptations:["auditiva","fijacion"], pet:false},
   {name:"Laura Escobar", rating:4.8, vehicle:"Camioneta adaptada", plate:"LES-852",
     adaptations:["rampa","elevador","ayuda","visual"], pet:true},
+
+  /* ---- Ampliación: más variedad y más cobertura de necesidades ----
+     Estas plantillas añaden combinaciones nuevas (silla sin plegar, señas,
+     entorno tranquilo, intérprete/acompañante, animal de asistencia
+     combinado con movilidad, etc.) para que casi cualquier perfil de
+     accesibilidad encuentre un vehículo muy compatible cerca. */
+  {name:"Yesenia Palacios", rating:4.9, vehicle:"Van con rampa y sujeción reforzada", plate:"YPS-114",
+    adaptations:["rampa","fijacion","espacio","ayuda"], pet:false},
+  {name:"Oscar Iván Bermúdez", rating:4.8, vehicle:"Camioneta silenciosa sensorial", plate:"OIB-227",
+    adaptations:["espacio","auditiva","ayuda"], pet:false},
+  {name:"Catalina Higuera", rating:4.95, vehicle:"Van con elevador y espacio para silla sin plegar", plate:"CHG-338",
+    adaptations:["elevador","espacio","fijacion"], pet:true},
+  {name:"Wilmer Achury", rating:4.7, vehicle:"Taxi con intérprete en lengua de señas", plate:"WAC-449",
+    adaptations:["auditiva","visual","ayuda"], pet:false},
+  {name:"Gloria Patricia Nieto", rating:4.85, vehicle:"Camioneta con acompañante y espacio extra", plate:"GPN-551",
+    adaptations:["espacio","ayuda","visual"], pet:true},
+  {name:"Harold Suárez", rating:4.6, vehicle:"Van rampa + elevador (doble acceso)", plate:"HRS-662",
+    adaptations:["rampa","elevador","fijacion","espacio"], pet:false},
+  {name:"Kelly Johana Ospina", rating:4.9, vehicle:"Sedán con apoyo para baja visión", plate:"KJO-773",
+    adaptations:["visual","auditiva"], pet:false},
+  {name:"Édgar Fabián Castañeda", rating:4.75, vehicle:"Camioneta pet friendly con rampa", plate:"EFC-884",
+    adaptations:["rampa","ayuda"], pet:true},
+  {name:"Marisol Quintero", rating:4.65, vehicle:"Van amplia con entorno tranquilo", plate:"MQT-995",
+    adaptations:["espacio","auditiva","visual"], pet:false},
+  {name:"Jhon Freddy Lozano", rating:4.8, vehicle:"Taxi adaptado con elevador", plate:"JFL-106",
+    adaptations:["elevador","fijacion"], pet:true},
+  {name:"Astrid Melo", rating:4.95, vehicle:"Camioneta con sujeción y ayuda física", plate:"AML-217",
+    adaptations:["fijacion","ayuda","espacio"], pet:false},
+  {name:"Deivy Alexander Rincón", rating:4.55, vehicle:"Van rampa pet friendly", plate:"DAR-328",
+    adaptations:["rampa","espacio"], pet:true},
+  {name:"Sandra Milena Forero", rating:4.9, vehicle:"Sedán con comunicación por texto", plate:"SMF-439",
+    adaptations:["auditiva"], pet:false},
+  {name:"Elkin Darío Gómez", rating:4.7, vehicle:"Camioneta con elevador y apoyo visual", plate:"EDG-540",
+    adaptations:["elevador","visual","ayuda"], pet:false},
+  {name:"Rocío Amparo Trujillo", rating:4.85, vehicle:"Van con rampa, fijación y acompañante", plate:"RAT-651",
+    adaptations:["rampa","fijacion","ayuda","espacio"], pet:false},
+  {name:"Brayan Steven Cuellar", rating:4.6, vehicle:"Taxi espacioso pet friendly", plate:"BSC-762",
+    adaptations:["espacio"], pet:true},
+  {name:"Ana Milena Rojas", rating:4.95, vehicle:"Camioneta con rampa y apoyo auditivo", plate:"AMR-873",
+    adaptations:["rampa","auditiva","ayuda"], pet:false},
+  {name:"Hernán Darío Quiroga", rating:4.75, vehicle:"Van con elevador pet friendly", plate:"HDQ-984",
+    adaptations:["elevador","ayuda"], pet:true},
+  {name:"Liliana Andrea Buitrago", rating:4.9, vehicle:"Sedán con apoyo visual y auditivo", plate:"LAB-095",
+    adaptations:["visual","auditiva","ayuda"], pet:false},
+  {name:"Fabio Enrique Mora", rating:4.65, vehicle:"Camioneta con rampa, elevador y espacio", plate:"FEM-106",
+    adaptations:["rampa","elevador","espacio","fijacion"], pet:true},
 ];
 
 const ADAPTATION_LABELS = {
@@ -2332,7 +2408,11 @@ function initClientMap(){
   if(!userAddress) reverseGeocode(userLatLng.lat, userLatLng.lng);
 
   if(!map){
-    map = L.map('map').setView([userLatLng.lat, userLatLng.lng], 14);
+    /* zoomControl:false — evita los botones de zoom nativos de Leaflet:
+       la app ya tiene sus propios botones táctiles grandes en
+       .map-a11y-controls (pensados para móvil y accesibilidad), y tener
+       los dos juntos duplicaba el control y se sobreponía visualmente. */
+    map = L.map('map', {zoomControl:false}).setView([userLatLng.lat, userLatLng.lng], 14);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution:'&copy; OpenStreetMap contributors', maxZoom:19
     }).addTo(map);
@@ -2374,7 +2454,7 @@ function shuffleArray(arr){
   return a;
 }
 
-const NEARBY_DRIVERS_COUNT = 8;
+const NEARBY_DRIVERS_COUNT = 10;
 
 let generatedDrivers = [];
 function placeNearbyDrivers(){
@@ -2394,6 +2474,12 @@ function placeNearbyDrivers(){
     return {...t, ...extra, id:i, lat, lng, distance, etaMin: Math.max(2, Math.round(distance*3.2))};
   }).sort((a,b)=>a.distance-b.distance);
 
+  // Garantiza que, sin importar qué subconjunto haya salido sorteado,
+  // siempre exista entre los conductores cercanos al menos uno con muy
+  // alta compatibilidad (≥80%) con el perfil de accesibilidad del pasajero.
+  const usedPlates = new Set(generatedDrivers.map(d=>d.plate));
+  ensureHighCompatDriver(currentProfile || {}, generatedDrivers, DRIVER_TEMPLATES, usedPlates);
+
   generatedDrivers.forEach(d=>{
     const marker = L.marker([d.lat, d.lng], {icon: pinIcon('marker-driver','🚐')}).addTo(map)
       .bindPopup(`<strong>${d.name}</strong><br>${d.vehicle}<br>${d.distance.toFixed(1)} km`);
@@ -2407,9 +2493,11 @@ function placeNearbyDrivers(){
 function renderNearbyList(){
   const box = document.getElementById('nearby-drivers-list');
   /* La lista de cercanos ya muestra la compatibilidad con el perfil, para que
-     se vea antes incluso de pedir el viaje. */
+     se vea antes incluso de pedir el viaje. El conductor más compatible
+     (garantizado ≥80% cuando el catálogo lo permite) siempre encabeza la
+     lista gracias a ensureHighCompatDriver + rankDrivers. */
   const ranked = rankDrivers(currentProfile || {}, generatedDrivers);
-  box.innerHTML = ranked.slice(0,4).map(d=>driverCardHTML(d, {interop:false})).join('');
+  box.innerHTML = ranked.slice(0,4).map((d,i)=>driverCardHTML(d, {interop:false, recommended:i===0})).join('');
 }
 
 function driverCardHTML(d, opts){
@@ -2836,7 +2924,25 @@ async function calculateTrip(){
   drawRoutePreview(pickup, dest, route.coords);
 
   const client = currentProfile || {};
-  const ranked = rankDrivers(client, generatedDrivers);
+  // Igual que en "Conductores cercanos": si entre los conductores generados
+  // ninguno llega al 80% de compatibilidad, se trae del catálogo completo
+  // el que mejor cubra las necesidades de este pasajero, para que la
+  // pantalla de "Elige tu conductor" siempre tenga al menos una opción muy
+  // compatible entre las primeras de la lista.
+  const usedPlates = new Set(generatedDrivers.map(d=>d.plate));
+  const prevCount = generatedDrivers.length;
+  const ranked = ensureHighCompatDriver(client, generatedDrivers, DRIVER_TEMPLATES, usedPlates);
+  // Si ensureHighCompatDriver trajo un conductor nuevo del catálogo completo,
+  // también se dibuja su marcador en el mapa para que la app sea consistente
+  // (el conductor recomendado aparece tanto en la lista como en el mapa).
+  if(generatedDrivers.length > prevCount && map){
+    const added = generatedDrivers[generatedDrivers.length - 1];
+    const marker = L.marker([added.lat, added.lng], {icon: pinIcon('marker-driver','🚐')}).addTo(map)
+      .bindPopup(`<strong>${added.name}</strong><br>${added.vehicle}<br>${added.distance.toFixed(1)} km`);
+    driverMarkers.push(marker);
+    const pill = document.getElementById('drivers-count-pill');
+    if(pill) pill.textContent = generatedDrivers.length + " disponibles";
+  }
   currentTrip.rankedDrivers = ranked;
   currentTrip.recommendedId = ranked.length ? ranked[0].id : null;
   currentTrip.chosenDriver = ranked.length ? ranked[0] : null;
@@ -2925,6 +3031,139 @@ function rankDrivers(client, drivers){
   return pool;
 }
 
+/* Compatibilidad mínima que SIEMPRE debe existir para al menos un
+   conductor visible: tanto en "Conductores cercanos" como al elegir
+   conductor dentro de "Solicitar un viaje". */
+const MIN_TOP_COMPAT = 80;
+
+/* Genera, a partir de una plantilla y una posición ya calculada (lat/lng/
+   distancia), un conductor completo con sus capacidades derivadas —
+   exactamente igual que placeNearbyDrivers, pero reutilizable para poder
+   "traer" candidatos del catálogo completo cuando hace falta. */
+function materializeDriver(template, id, lat, lng, distance){
+  const extra = buildDriverProfile(template);
+  return {...template, ...extra, id, lat, lng, distance, etaMin: Math.max(2, Math.round(distance*3.2))};
+}
+
+/* Todas las capacidades ("caps") que puede necesitar un requisito esencial
+   del catálogo de accesibilidad. Se usan para poder construir, si hiciera
+   falta, un conductor cuyo vehículo las cubra todas explícitamente en vez
+   de depender del azar de una placa. */
+const ALL_ESSENTIAL_CAPS = ['rampa','elevador','silla_sin_plegar','fijacion','asistencia_fisica',
+  'animal_asistencia','texto','guia_verbal','interprete_ok','acompanante','entorno_tranquilo'];
+
+/* Un conductor de reserva de "Movilidad Incluyente" — la flota municipal
+   citada en INTEROP_SOURCES — que trae vehículos con adaptación especial
+   bajo pedido. Sirve de base realista (nombre, calificación, experiencia)
+   cuando hay que construir un conductor a la medida de un perfil exigente. */
+const RESERVE_FLEET = [
+  {name:"Servicio adaptado — Movilidad Incluyente", rating:4.9, vehicle:"Vehículo con adaptación especial bajo pedido"},
+  {name:"Servicio adaptado — Cooperativa de Transporte Adaptado", rating:4.85, vehicle:"Vehículo con adaptación especial bajo pedido"},
+];
+
+/* Si dentro del conjunto de conductores generados ("cercanos" o los
+   candidatos al pedir el viaje) ninguno alcanza el mínimo de compatibilidad
+   garantizado, se busca primero en el resto del catálogo (con varias
+   plantillas distintas, ya que las capacidades adicionales de cada una se
+   derivan de forma determinista de su placa). Si ni así aparece una opción
+   que cubra todas las necesidades indispensables del pasajero con ≥80% de
+   compatibilidad, se arma un conductor de la flota de reserva cuyo vehículo
+   trae explícitamente TODAS las capacidades que ese perfil requiere. Así el
+   pasajero nunca se queda sin al menos una opción muy compatible, sin
+   importar cuántas ni cuáles necesidades haya marcado. */
+function ensureHighCompatDriver(client, drivers, allTemplates, usedPlates){
+  let ranked = rankDrivers(client, drivers);
+  if(ranked.length && ranked[0].compat.percent >= MIN_TOP_COMPAT && !ranked[0].compat.essentialUnmet){
+    return ranked;
+  }
+
+  const usedSet = usedPlates || new Set(drivers.map(d=>d.plate));
+  const candidates = allTemplates.filter(t=>!usedSet.has(t.plate));
+  let best = null, bestCompat = null;
+  candidates.forEach(t=>{
+    // Compatibilidad "seca": se evalúa con una distancia neutra (0) porque
+    // aún no tiene una posición asignada; la distancia real solo aporta
+    // unos pocos puntos secundarios y no cambia si el conductor cubre o no
+    // las necesidades indispensables del pasajero.
+    const probe = {...t, distance:0, rating:t.rating};
+    const compat = computeCompatibility(client, probe);
+    if(!bestCompat || compat.percent > bestCompat.percent ||
+       (compat.percent === bestCompat.percent && !compat.essentialUnmet && bestCompat.essentialUnmet)){
+      best = t; bestCompat = compat;
+    }
+  });
+
+  if(best && bestCompat && bestCompat.percent >= MIN_TOP_COMPAT && !bestCompat.essentialUnmet){
+    addCatalogDriver(drivers, best);
+    return rankDrivers(client, drivers);
+  }
+
+  // Ningún conductor real del catálogo alcanza el mínimo: se arma un
+  // conductor de la flota de reserva con exactamente las capacidades
+  // esenciales (y las más comunes de apoyo) que este perfil necesita, para
+  // que siempre haya una opción de alta compatibilidad disponible.
+  const requiredCaps = new Set();
+  clientRequirements(client).forEach(r=>{ r.caps.forEach(c=>requiredCaps.add(c)); });
+  ALL_ESSENTIAL_CAPS.forEach(c=>{ if(requiredCaps.has(c)) requiredCaps.add(c); });
+  addReserveDriver(drivers, requiredCaps);
+  return rankDrivers(client, drivers);
+}
+
+/* Añade al arreglo `drivers` un conductor materializado a partir de una
+   plantilla real del catálogo, ubicado muy cerca del pasajero. */
+function addCatalogDriver(drivers, template){
+  const lat = jitter(userLatLng.lat, 600);
+  const lng = jitter(userLatLng.lng, 600);
+  const distance = haversine(userLatLng.lat, userLatLng.lng, lat, lng);
+  const newId = drivers.reduce((max,d)=>Math.max(max, d.id), -1) + 1;
+  drivers.push(materializeDriver(template, newId, lat, lng, distance));
+}
+
+/* Construye y añade un conductor de la flota de reserva cuyas capacidades
+   (`caps`) incluyen, de forma explícita y garantizada, cada una de las
+   capacidades en `requiredCaps`, además de las capacidades de apoyo más
+   habituales (para que también luzca bien en necesidades no esenciales). */
+function addReserveDriver(drivers, requiredCaps){
+  const base = RESERVE_FLEET[drivers.length % RESERVE_FLEET.length];
+  const lat = jitter(userLatLng.lat, 700);
+  const lng = jitter(userLatLng.lng, 700);
+  const distance = haversine(userLatLng.lat, userLatLng.lng, lat, lng);
+  const newId = drivers.reduce((max,d)=>Math.max(max, d.id), -1) + 1;
+  const plate = 'RSV-' + String(900 + newId).padStart(3,'0');
+
+  const caps = new Set([
+    ...requiredCaps,
+    // Capacidades de apoyo habituales: hacen que este vehículo de reserva
+    // también quede bien calificado frente a necesidades no indispensables.
+    'espacio_amplio','asistencia_fisica','tiempo_flexible','conoce_mecanismos',
+    'guia_verbal','texto','identificacion_clara','instrucciones_simples'
+  ]);
+
+  // Etiquetas visibles ("Rampa", "Elevador hidráulico"…) coherentes con las
+  // capacidades reales que trae este vehículo de reserva.
+  const adaptations = [];
+  if(caps.has('rampa')) adaptations.push('rampa');
+  if(caps.has('elevador')) adaptations.push('elevador');
+  if(caps.has('espacio_amplio') || caps.has('silla_sin_plegar')) adaptations.push('espacio');
+  if(caps.has('fijacion')) adaptations.push('fijacion');
+  if(caps.has('asistencia_fisica')) adaptations.push('ayuda');
+  if(caps.has('guia_verbal') || caps.has('exp_visual')) adaptations.push('visual');
+  if(caps.has('texto') || caps.has('exp_auditiva')) adaptations.push('auditiva');
+
+  const driver = {
+    name: base.name, rating: base.rating, vehicle: base.vehicle, plate,
+    adaptations: adaptations.length ? adaptations : ['espacio'],
+    pet: caps.has('animal_asistencia'),
+    caps: Array.from(caps),
+    experienceYears: 6,
+    assistedTrips: 420,
+    sources: ['Movilidad Incluyente — flota municipal', 'Cooperativa de Transporte Adaptado'],
+    id: newId, lat, lng, distance,
+    etaMin: Math.max(2, Math.round(distance*3.2))
+  };
+  drivers.push(driver);
+}
+
 /* ---------- Confirm & Track Trip ---------- */
 function confirmTrip(){
   if(!currentTrip || !currentTrip.chosenDriver){ return; }
@@ -2975,7 +3214,7 @@ async function setupTracking(){
   document.getElementById('track-fare').textContent = formatCOP(activeRide.fare);
 
   if(trackMap) { trackMap.remove(); trackMap=null; }
-  trackMap = L.map('map-tracking').setView([userLatLng.lat, userLatLng.lng], 14);
+  trackMap = L.map('map-tracking', {zoomControl:false}).setView([userLatLng.lat, userLatLng.lng], 14);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution:'&copy; OpenStreetMap contributors'}).addTo(trackMap);
   L.marker([activeRide.pickup.lat, activeRide.pickup.lng], {icon:pinIcon('marker-user','🧍')}).addTo(trackMap).bindPopup("Punto de recogida");
   L.marker([activeRide.dest.lat, activeRide.dest.lng], {icon:pinIcon('marker-dest','🏁')}).addTo(trackMap).bindPopup("Destino");
