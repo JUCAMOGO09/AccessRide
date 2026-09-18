@@ -817,6 +817,204 @@ input, select, textarea, .addr-field, .btn{ scroll-margin:6em 0; }
 /* El desplegable de direcciones nunca debe quedar debajo del teclado */
 .addr-suggestions{ max-height:min(280px, calc(var(--vvh, 100vh) * 0.38)); }
 
+
+/* ==============================================================================
+   AMPLIACIÓN 2 — PERFIL DE ACCESIBILIDAD, COMPATIBILIDAD, INTEROPERABILIDAD,
+   INTERFAZ SIMPLIFICADA Y EMERGENCIA
+   Se añade al final de la hoja para heredar los tokens ya definidos y no
+   modificar ninguna regla anterior.
+   ============================================================================== */
+
+/* ---------- PERFIL DE ACCESIBILIDAD (listas de casillas) ---------- */
+.a11y-profile-intro{
+  background:var(--bg-tertiary); border:1px solid var(--border-subtle); border-radius:var(--radius-sm);
+  padding:1em 1.1em; margin:0 0 1.1em;
+}
+.a11y-profile-intro p{ margin:0; font-size:.92rem; }
+.a11y-disclaimer{
+  border-left:6px solid var(--accent-primary); background:color-mix(in srgb, var(--accent-primary) 8%, transparent);
+  border-radius:var(--radius-xs); padding:.95em 1.1em; margin:1.1em 0 .4em; font-size:.88rem; color:var(--text-secondary);
+}
+.a11y-disclaimer strong{ color:var(--text-primary); display:block; margin-bottom:.3em; }
+.a11y-cat{
+  border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--bg-secondary);
+  margin-bottom:.9em; overflow:hidden;
+}
+.a11y-cat > summary{
+  list-style:none; cursor:pointer; padding:.95em 1.1em; font-weight:800; font-family:var(--font-disp);
+  display:flex; align-items:center; justify-content:space-between; gap:.7em; min-height:var(--hit);
+  color:var(--text-primary); background:var(--bg-tertiary);
+}
+.a11y-cat > summary::-webkit-details-marker{ display:none; }
+.a11y-cat > summary:focus-visible{ outline:var(--focus); outline-offset:-3px; }
+.a11y-cat[open] > summary{ border-bottom:1px solid var(--border); }
+.a11y-cat-count{ font-size:.8rem; font-weight:800; padding:.25em .8em; border-radius:999px;
+  background:color-mix(in srgb, var(--accent-primary) 14%, transparent); color:var(--accent-primary); flex:none; }
+.a11y-cat-count.empty{ background:var(--bg-primary); color:var(--text-muted); border:1px solid var(--border); }
+.a11y-cat-body{ padding:.7em 1.1em 1.1em; }
+.a11y-opt{
+  display:flex; align-items:flex-start; gap:.75em; padding:.5em .2em; min-height:var(--hit);
+  border-radius:var(--radius-xs); cursor:pointer; font-weight:400; color:var(--text-secondary); margin:0;
+}
+.a11y-opt:hover{ background:var(--bg-tertiary); }
+.a11y-opt input{ width:24px; height:24px; margin-top:.15em; flex:none; accent-color:var(--accent-primary); cursor:pointer; }
+.a11y-opt span{ line-height:1.4; }
+.a11y-opt input:checked + span{ color:var(--text-primary); font-weight:700; }
+.a11y-selected-summary{ display:flex; flex-wrap:wrap; gap:.4em; margin:.6em 0 0; }
+
+/* ---------- COMPATIBILIDAD PASAJERO–VEHÍCULO ---------- */
+.compat-head{
+  display:flex; align-items:center; gap:.8em; margin:.1em 0 .5em; flex-wrap:wrap;
+}
+.compat-score{
+  display:inline-flex; align-items:baseline; gap:.15em; font-family:var(--font-disp); font-weight:800;
+  font-size:1.35rem; color:var(--accent-primary); line-height:1;
+}
+.compat-score .pct{ font-size:.9rem; font-weight:800; }
+.compat-label{ font-size:.85rem; color:var(--text-secondary); font-weight:700; }
+.compat-bar{ height:10px; border-radius:999px; background:var(--bg-tertiary); border:1px solid var(--border-subtle); overflow:hidden; margin:.15em 0 .6em; }
+.compat-bar > i{ display:block; height:100%; border-radius:999px; background:var(--accent-primary); transition:width .5s var(--ease); }
+.compat-level-alta > i{ background:var(--accent-success); }
+.compat-level-media > i{ background:var(--accent-secondary); }
+.compat-level-baja > i{ background:var(--accent-danger); }
+.compat-summary{ font-size:.92rem; color:var(--text-primary); font-weight:700; margin:.1em 0 .4em; }
+.compat-list{ margin:.3em 0 0; padding:0; list-style:none; font-size:.88rem; }
+.compat-list li{ display:flex; gap:.5em; align-items:flex-start; padding:.16em 0; color:var(--text-secondary); }
+.compat-list li::before{ content:"✓"; color:var(--accent-success); font-weight:900; flex:none; }
+.compat-list li.miss{ color:var(--text-muted); }
+.compat-list li.miss::before{ content:"✕"; color:var(--accent-danger); }
+.compat-list li.sec::before{ content:"•"; color:var(--text-muted); }
+.compat-toggle{
+  background:none; border:none; padding:.4em 0; color:var(--accent-primary); font-weight:700; font-size:.88rem;
+  text-decoration:underline; min-height:var(--hit); text-align:left;
+}
+.compat-warn{
+  display:block; font-size:.85rem; font-weight:700; color:var(--accent-danger);
+  background:color-mix(in srgb, var(--accent-danger) 10%, transparent); border:1px solid color-mix(in srgb, var(--accent-danger) 25%, transparent);
+  border-radius:var(--radius-xs); padding:.5em .8em; margin:.5em 0 0;
+}
+.driver-card.partial{ border-style:dashed; }
+
+/* ---------- INTEROPERABILIDAD (simulada) ---------- */
+.interop{
+  margin-top:.75em; padding:.75em .9em; border:1px dashed var(--border); border-radius:var(--radius-xs);
+  background:var(--bg-tertiary);
+}
+.interop-title{ font-size:.82rem; font-weight:800; color:var(--text-primary); display:flex; align-items:center; gap:.45em; flex-wrap:wrap; }
+.interop-sim{
+  font-size:.7rem; font-weight:800; padding:.2em .6em; border-radius:999px;
+  background:color-mix(in srgb, var(--accent-secondary) 16%, transparent); color:var(--accent-secondary);
+  border:1px solid color-mix(in srgb, var(--accent-secondary) 34%, transparent);
+}
+.interop-rows{ margin:.5em 0 0; padding:0; list-style:none; font-size:.85rem; color:var(--text-secondary); }
+.interop-rows li{ display:flex; gap:.5em; padding:.14em 0; }
+.interop-rows b{ color:var(--text-primary); font-weight:700; }
+.interop-note{ font-size:.75rem; color:var(--text-muted); margin:.5em 0 0; }
+
+/* ---------- INTERFAZ SIMPLIFICADA ---------- */
+.simple-choice-card{
+  background:var(--bg-secondary); border:2px solid var(--border); border-radius:var(--radius);
+  padding:1.6em; max-width:460px; margin:0 auto; text-align:left; box-shadow:var(--shadow-md);
+}
+.simple-choice-card h2{ font-size:1.5rem; }
+.simple-choice-card .btn{ font-size:1.12rem; padding:1.15em 1.4em; }
+.simple-preview{ display:flex; gap:.6em; margin:.4em 0 1.2em; }
+.simple-preview div{
+  flex:1; border:1px solid var(--border); border-radius:var(--radius-xs); padding:.7em; font-size:.8rem;
+  color:var(--text-secondary); background:var(--bg-primary);
+}
+.simple-preview strong{ display:block; color:var(--text-primary); font-size:.9rem; margin-bottom:.25em; }
+
+#simple-home{ padding:1.2em 1.1em 2em; }
+.simple-dest{
+  border:3px solid var(--accent-primary); border-radius:var(--radius); background:var(--bg-secondary);
+  padding:1.1em; margin-bottom:1em;
+}
+.simple-dest .lbl{ font-size:1.05rem; font-weight:800; color:var(--text-primary); display:block; margin-bottom:.4em; }
+.simple-dest input{ font-size:1.1rem; padding:1em; border-width:3px; }
+.simple-actions{ display:grid; gap:.9em; }
+.btn-simple{
+  min-height:82px; font-size:1.25rem; font-weight:800; border-radius:var(--radius);
+  border:3px solid var(--accent-primary); background:var(--bg-secondary); color:var(--text-primary);
+  display:flex; align-items:center; justify-content:flex-start; gap:.8em; padding:1em 1.2em; text-align:left; width:100%;
+}
+.btn-simple .ico{ font-size:1.9rem; flex:none; }
+.btn-simple:hover{ background:var(--accent-primary); color:#fff; }
+[data-theme="dark"] .btn-simple:hover{ color:#0B1120; }
+.btn-simple.go{ background:var(--accent-primary); color:#fff; }
+[data-theme="dark"] .btn-simple.go{ color:#0B1120; }
+.btn-simple.sos{ border-color:var(--accent-danger); background:var(--accent-danger); color:#fff; }
+.btn-simple.sos:hover{ background:var(--accent-danger-hover); color:#fff; }
+.btn-simple.quiet{ border-color:var(--border); }
+.simple-status{
+  border:3px solid var(--accent-secondary); border-radius:var(--radius); background:var(--bg-secondary);
+  padding:1.1em; margin-bottom:1em; font-size:1.05rem; font-weight:700; color:var(--text-primary);
+}
+.simple-status .sub{ display:block; font-size:.92rem; font-weight:400; color:var(--text-secondary); margin-top:.3em; }
+.simple-exit{ margin-top:1.4em; }
+
+/* Modo simplificado activo: se ocultan los elementos no esenciales */
+[data-simple="on"] #screen-client-home .map-wrap,
+[data-simple="on"] #screen-client-home .sheet,
+[data-simple="on"] #screen-client-home .address-bar,
+[data-simple="on"] #screen-client-home .emergency-fab{ display:none !important; }
+[data-simple="on"] #simple-home{ display:block; }
+#simple-home{ display:none; }
+[data-simple="on"] .bottom-nav button{ font-size:.95rem; min-height:calc(var(--hit) + 22px + env(safe-area-inset-bottom)); }
+[data-simple="on"] .screen.active{ animation:none; }
+[data-simple="on"] .btn{ font-size:1.1rem; }
+[data-simple="on"] .topbar{ padding:1em 1.2em; }
+
+/* ---------- INTERFAZ DE EMERGENCIA (SOS) ---------- */
+.sos-modal{ border-top:8px solid var(--accent-danger); }
+.sos-title{ color:var(--accent-danger); font-size:1.6rem; display:flex; align-items:center; gap:.4em; }
+.sos-lead{ font-size:1.05rem; color:var(--text-primary); font-weight:700; margin-bottom:1em; }
+.sos-options{ display:grid; gap:.8em; margin-bottom:1.2em; }
+.btn-sos-option{
+  min-height:74px; border:3px solid var(--accent-danger); border-radius:var(--radius);
+  background:var(--bg-secondary); color:var(--text-primary); font-size:1.12rem; font-weight:800;
+  display:flex; align-items:center; gap:.8em; padding:.9em 1.1em; text-align:left; width:100%;
+}
+.btn-sos-option .ico{ font-size:1.7rem; flex:none; }
+.btn-sos-option:hover{ background:var(--accent-danger); color:#fff; }
+.btn-sos-option:hover .ico{ filter:grayscale(1) brightness(3); }
+.sos-alert-head{
+  border:3px solid var(--accent-danger); background:color-mix(in srgb, var(--accent-danger) 10%, transparent);
+  border-radius:var(--radius); padding:1.1em; margin-bottom:1em;
+}
+.sos-alert-head h2{ color:var(--accent-danger); font-size:1.45rem; margin-bottom:.2em; display:flex; align-items:center; gap:.4em; }
+.sos-alert-head p{ margin:0; font-weight:700; color:var(--text-primary); }
+.sos-facts{ border:1px solid var(--border); border-radius:var(--radius-sm); overflow:hidden; margin-bottom:1em; }
+.sos-fact{ display:flex; gap:.9em; padding:.8em 1em; border-bottom:1px solid var(--border-subtle); font-size:1rem; }
+.sos-fact:last-child{ border-bottom:none; }
+.sos-fact .k{ font-weight:800; color:var(--text-primary); flex:none; min-width:8.5em; }
+.sos-fact .v{ color:var(--text-secondary); word-break:break-word; }
+.sos-steps{ list-style:none; margin:0 0 1.2em; padding:0; }
+.sos-steps li{
+  display:flex; gap:.6em; align-items:flex-start; padding:.6em .9em; font-size:.98rem; font-weight:700;
+  border:1px solid var(--border); border-radius:var(--radius-xs); margin-bottom:.5em; background:var(--bg-tertiary);
+  color:var(--text-primary);
+}
+.sos-steps li .tick{ color:var(--accent-success); font-weight:900; flex:none; }
+.sos-steps li .sim{ font-weight:400; color:var(--text-muted); }
+.sos-actions{ display:grid; gap:.7em; }
+.sos-actions .btn{ min-height:66px; font-size:1.08rem; }
+@media (min-width:560px){
+  .sos-options{ grid-template-columns:1fr 1fr; }
+  .sos-actions{ grid-template-columns:1fr 1fr; }
+  .sos-actions .btn-block.full{ grid-column:1 / -1; }
+}
+
+/* ---------- RECONOCIMIENTO DE DESTINO POR VOZ ---------- */
+.voice-dest{
+  position:fixed; left:50%; transform:translateX(-50%); top:calc(76px + env(safe-area-inset-top));
+  z-index:1600; background:var(--bg-elevated); border:3px solid var(--accent-primary); border-radius:var(--radius);
+  padding:1em 1.3em; box-shadow:var(--shadow-lg); width:min(520px, 92vw); text-align:center;
+}
+.voice-dest .k{ font-size:.85rem; color:var(--text-muted); font-weight:700; display:block; }
+.voice-dest .v{ font-size:1.25rem; font-weight:800; color:var(--text-primary); display:block; margin:.15em 0 .3em; }
+.voice-dest .s{ font-size:.9rem; color:var(--accent-primary); font-weight:700; }
+
 </style>
 </head>
 <body>
@@ -906,8 +1104,8 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err=>{
 
         <button type="submit" class="btn btn-primary btn-block" id="btn-login" style="margin-top:1.6em;">Ingresar</button>
       </form>
-      <button type="button" class="btn btn-outline btn-block" id="btn-demo-login" style="margin-top:1em;" onclick="handleDemoLogin()">🧪 Ingresar para prueba</button>
-      <p class="help" style="text-align:center;margin-bottom:0;margin-top:.6em;">Crea una cuenta de prueba con datos inventados, sin necesidad de registrarte.</p>
+      <button type="button" class="btn btn-outline btn-block" id="btn-demo-login" style="margin-top:1em;" onclick="handleDemoLogin()">🧪 Ingresar con cuenta de demostración</button>
+      <p class="help" style="text-align:center;margin-bottom:0;margin-top:.6em;">Rellena el correo y la contraseña de la cuenta de demostración y entra directamente, sin registrarte.</p>
       <p style="margin-top:1.4em;text-align:center;">¿No tienes cuenta? <a href="#" onclick="goTo('screen-register-client');return false;">Regístrate aquí</a></p>
       <p class="help" style="text-align:center;margin-bottom:0;margin-top:.8em;">Tus datos se guardan en Firebase, así que puedes entrar desde cualquier dispositivo con el mismo correo.</p>
     </div>
@@ -960,35 +1158,11 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err=>{
       </fieldset>
 
       <fieldset>
-        <legend>Información de discapacidad</legend>
-        <label for="c-tipo">Tipo de necesidad</label>
-        <select id="c-tipo" required>
-          <option value="">Selecciona una opción</option>
-          <option value="silla_manual">Usuario de silla de ruedas manual</option>
-          <option value="silla_electrica">Usuario de silla de ruedas eléctrica</option>
-          <option value="movilidad_reducida">Movilidad reducida</option>
-          <option value="visual">Discapacidad visual</option>
-          <option value="auditiva">Discapacidad auditiva</option>
-          <option value="cognitiva">Discapacidad cognitiva</option>
-          <option value="otra">Otra</option>
-        </select>
-
-        <div class="check-row">
-          <input type="checkbox" id="c-espacio">
-          <label for="c-espacio" style="margin:0;font-weight:400;">Necesito espacio especial para silla de ruedas</label>
+        <legend>Perfil de accesibilidad <span class="pill pill-gold" style="font-size:.72rem;vertical-align:middle;">Opcional</span></legend>
+        <div class="a11y-profile-intro">
+          <p>Marca solo lo que te sirva. Ninguna casilla es obligatoria y puedes cambiarlas cuando quieras desde tu perfil.</p>
         </div>
-        <div class="check-row">
-          <input type="checkbox" id="c-ayuda">
-          <label for="c-ayuda" style="margin:0;font-weight:400;">Necesito ayuda para subir o bajar del vehículo</label>
-        </div>
-        <div class="check-row">
-          <input type="checkbox" id="c-mascota" onchange="document.getElementById('c-tipo-mascota-wrap').classList.toggle('hidden', !this.checked)">
-          <label for="c-mascota" style="margin:0;font-weight:400;">Viajo con animal de compañía</label>
-        </div>
-        <div id="c-tipo-mascota-wrap" class="hidden">
-          <label for="c-tipo-mascota">Tipo de animal de compañía</label>
-          <input id="c-tipo-mascota" type="text" placeholder="Ej: perro guía, gato">
-        </div>
+        <div id="c-a11y-profile" data-a11y-form="registro"></div>
 
         <label for="c-obs">Observaciones importantes para el conductor</label>
         <textarea id="c-obs" rows="3" placeholder="Ej: uso audífonos, prefiero que me hablen de frente, etc."></textarea>
@@ -1041,6 +1215,26 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err=>{
 </section>
 
 <!-- ============================================================ -->
+<!-- ELECCIÓN DE INTERFAZ (después de obtener la ubicación) -->
+<!-- ============================================================ -->
+<section id="screen-simple-choice" class="screen" aria-label="Elegir tipo de interfaz">
+  <div class="landing" style="min-height:100vh; display:flex; align-items:center;">
+    <div class="landing-inner">
+      <div class="simple-choice-card">
+        <h2>¿Quieres utilizar la interfaz simplificada?</h2>
+        <p style="margin-bottom:1em;">Ya tenemos tu ubicación. Elige cómo prefieres ver AccessRide. Puedes cambiarlo cuando quieras desde Configuración.</p>
+        <div class="simple-preview">
+          <div><strong>Simplificada</strong>Botones grandes, alto contraste y solo lo esencial: destino, viaje, conductor y SOS.</div>
+          <div><strong>Normal</strong>Mapa, conductores cercanos, historial y todas las funciones de la aplicación.</div>
+        </div>
+        <button class="btn btn-primary btn-block" style="margin-bottom:.8em;" onclick="chooseSimpleUI(true)">Sí, activar interfaz simplificada</button>
+        <button class="btn btn-outline btn-block" onclick="chooseSimpleUI(false)">No, continuar con interfaz normal</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
 <!-- CLIENT HOME / MAP -->
 <!-- ============================================================ -->
 <section id="screen-client-home" class="screen" aria-label="Inicio del cliente">
@@ -1054,6 +1248,33 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err=>{
       <div style="font-size:.8rem;color:var(--text-muted);">Tu ubicación actual</div>
       <div id="current-address" style="font-weight:700;color:var(--text-primary);">Detectando dirección…</div>
     </div>
+  </div>
+
+  <!-- ===== INTERFAZ SIMPLIFICADA ===== -->
+  <div id="simple-home">
+    <div id="simple-trip-status" class="simple-status" role="status" hidden></div>
+
+    <div class="simple-dest">
+      <label class="lbl" for="simple-dest-input">¿A dónde quieres ir?</label>
+      <div class="addr-field">
+        <input id="simple-dest-input" type="text" placeholder="Escribe el lugar o la dirección"
+               role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="simple-dest-input-list"
+               autocomplete="off"
+               oninput="onAddressInput('simple-dest-input')" onkeydown="onAddressKeydown(event,'simple-dest-input')"
+               onblur="scheduleCloseSuggestions('simple-dest-input')">
+        <ul id="simple-dest-input-list" class="addr-suggestions hidden" role="listbox" aria-label="Sugerencias de destino"></ul>
+      </div>
+    </div>
+
+    <div class="simple-actions">
+      <button type="button" class="btn-simple go" onclick="simpleRequestTrip()"><span class="ico" aria-hidden="true">🚐</span>Solicitar viaje</button>
+      <button type="button" class="btn-simple" onclick="simpleShowDriver()"><span class="ico" aria-hidden="true">👤</span>Ver conductor</button>
+      <button type="button" class="btn-simple quiet" onclick="cancelActiveTrip()"><span class="ico" aria-hidden="true">✕</span>Cancelar viaje</button>
+      <button type="button" class="btn-simple" onclick="simpleSpeak()"><span class="ico" aria-hidden="true">🎤</span>Hablar</button>
+      <button type="button" class="btn-simple sos" onclick="triggerEmergency()"><span class="ico" aria-hidden="true">🆘</span>SOS — pedir ayuda</button>
+    </div>
+
+    <button type="button" class="btn btn-ghost btn-block simple-exit" onclick="setSimpleUI(false)">Volver a la interfaz normal</button>
   </div>
   <div class="map-wrap">
     <div id="map" role="application" aria-label="Mapa con tu ubicación y conductores disponibles cerca"></div>
@@ -1133,7 +1354,7 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err=>{
         </div>
       </div>
       <h3>Elige tu conductor</h3>
-      <p class="help" style="margin-top:-.4em;">Te sugerimos el mejor conductor según tus necesidades, pero puedes elegir cualquier otro de la lista.</p>
+      <p class="help" style="margin-top:-.4em;">Ordenados por compatibilidad con tu perfil de accesibilidad. Toca “Ver por qué” para saber qué cubre cada vehículo. Puedes elegir cualquiera de la lista.</p>
       <div id="drivers-choice-list"></div>
       <div style="display:flex; gap:.9em; margin-top:1.2em;">
         <button class="btn btn-outline btn-block" onclick="backToStep1()">Volver</button>
@@ -1200,11 +1421,44 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err=>{
 </section>
 
 <div id="modal-emergency" class="modal-backdrop hidden" role="alertdialog" aria-modal="true" aria-labelledby="emergency-title">
-  <div class="modal" style="text-align:center;">
-    <h2 id="emergency-title" style="color:var(--accent-danger);">🆘 Alerta de emergencia activada</h2>
-    <p style="color:var(--text-secondary);">Hemos notificado a tu contacto de confianza y compartido tu ubicación en tiempo real. Mantén la calma, la ayuda va en camino.</p>
-    <p class="help">(Simulación — en un despliegue real esto contactaría a la línea de emergencias 123 y a tu contacto registrado.)</p>
-    <button class="btn btn-primary btn-block" onclick="closeModal('modal-emergency')">Entendido</button>
+  <div class="modal sos-modal">
+
+    <!-- Paso 1: confirmar qué está pasando -->
+    <div id="sos-step-confirm">
+      <h2 id="emergency-title" class="sos-title"><span aria-hidden="true">🆘</span> ¿Qué está pasando?</h2>
+      <p class="sos-lead">Toca el botón que describa tu situación. Enviaremos la alerta con tu ubicación y los datos del viaje.</p>
+      <div class="sos-options" role="group" aria-label="Tipo de emergencia">
+        <button type="button" class="btn-sos-option" onclick="confirmEmergency('ayuda')"><span class="ico" aria-hidden="true">🙋</span>Necesito ayuda</button>
+        <button type="button" class="btn-sos-option" onclick="confirmEmergency('accidente')"><span class="ico" aria-hidden="true">💥</span>Accidente</button>
+        <button type="button" class="btn-sos-option" onclick="confirmEmergency('medica')"><span class="ico" aria-hidden="true">🚑</span>Emergencia médica</button>
+        <button type="button" class="btn-sos-option" onclick="confirmEmergency('inseguridad')"><span class="ico" aria-hidden="true">⚠️</span>Me siento inseguro o insegura</button>
+        <button type="button" class="btn-sos-option" onclick="confirmEmergency('otro')"><span class="ico" aria-hidden="true">❓</span>Otro problema</button>
+      </div>
+      <button type="button" class="btn btn-ghost btn-block" style="min-height:66px;font-size:1.05rem;" onclick="closeEmergency()">Cancelar, no es una emergencia</button>
+    </div>
+
+    <!-- Paso 2: alerta activada -->
+    <div id="sos-step-active" class="hidden">
+      <div class="sos-alert-head">
+        <h2><span aria-hidden="true">🆘</span> Alerta de emergencia activada</h2>
+        <p id="sos-type-line">Necesito ayuda</p>
+      </div>
+
+      <h3 style="font-size:1.05rem;">Información enviada</h3>
+      <div class="sos-facts" id="sos-facts"></div>
+
+      <h3 style="font-size:1.05rem;">Acciones en curso</h3>
+      <ul class="sos-steps" id="sos-steps"></ul>
+
+      <div class="sos-actions">
+        <button type="button" class="btn btn-danger btn-block" onclick="callTrustedContact()">📞 Llamar a contacto de emergencia</button>
+        <button type="button" class="btn btn-outline btn-block" onclick="shareEmergencyLocation()">📍 Compartir ubicación</button>
+        <button type="button" class="btn btn-outline btn-block" onclick="showEmergencyTripInfo()">🚐 Mostrar información del viaje</button>
+        <button type="button" class="btn btn-ghost btn-block full" onclick="cancelEmergencyAlert()">✕ Cancelar alerta</button>
+      </div>
+      <p class="help" style="margin-top:1em;">Prototipo académico: la alerta queda registrada en la aplicación, pero no se envía a servicios de emergencia reales.</p>
+    </div>
+
   </div>
 </div>
 
@@ -1253,6 +1507,25 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err=>{
         <span class="toggle-track"></span>
       </span>
     </label>
+
+    <label class="settings-row" for="a11y-simple" style="cursor:pointer;">
+      <div class="settings-row-text">
+        <strong>Interfaz simplificada</strong>
+        <span>Botones grandes y solo lo esencial: destino, viaje, conductor y SOS</span>
+      </div>
+      <span class="toggle-switch">
+        <input type="checkbox" id="a11y-simple" onchange="setSimpleUI(this.checked)">
+        <span class="toggle-track"></span>
+      </span>
+    </label>
+
+    <div class="settings-row">
+      <div class="settings-row-text">
+        <strong>Perfil de accesibilidad</strong>
+        <span>Revisa o cambia las necesidades que usamos para buscarte un vehículo compatible</span>
+      </div>
+      <button type="button" class="btn btn-outline btn-sm" onclick="closeModal('modal-settings'); goTo('screen-profile');">Editar</button>
+    </div>
 
     <!-- ===== ACCESIBILIDAD VISUAL ===== -->
     <h3 class="a11y-section-title">👁️ Accesibilidad visual</h3>
@@ -1332,7 +1605,7 @@ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(err=>{
       </span>
     </label>
     <p class="kbd-hint" style="margin:-.3em 0 .6em;">
-      Di <em>“solicitar un viaje”</em>, <em>“llévame a…”</em>, <em>“emergencia”</em> o <em>“ayúdame”</em> para ver todos los comandos.
+      Di <em>"quiero ir a…"</em>, <em>"llévame a…"</em>, <em>"mostrar conductores"</em>, <em>"¿dónde está mi conductor?"</em>, <em>"repetir información"</em>, <em>"cancelar viaje"</em> o <em>"emergencia"</em>. Di <em>"ayúdame"</em> para ver todos los comandos.
       <button type="button" class="btn btn-ghost btn-sm" style="margin-top:.5em;" onclick="a11yVoiceHelp()">Ver comandos de voz</button>
     </p>
 
@@ -1600,6 +1873,9 @@ function applyProfilePreferences(profile){
   if(!profile || !profile.preferencias) return;
   if(profile.preferencias.tema) applyTheme(profile.preferencias.tema);
   applyContrast(profile.preferencias.contraste === 'high');
+  if(typeof profile.preferencias.interfazSimplificada === 'boolean' && typeof setSimpleUI === 'function'){
+    setSimpleUI(profile.preferencias.interfazSimplificada, true);
+  }
 }
 
 /* ---------- Navigation ---------- */
@@ -1611,6 +1887,7 @@ function goTo(id){
   if(id==='screen-client-home'){
     clearRoutePreview();
     setTimeout(initClientMap, 60);
+    if(typeof updateSimpleTripStatus === 'function') updateSimpleTripStatus();
   }
   if(id==='screen-profile') fillProfile();
   if(id==='screen-history') renderTripHistory();
@@ -1741,6 +2018,13 @@ async function handleRegisterClient(e){
     const cred = await auth.createUserWithEmailAndPassword(email, password);
     const user = cred.user;
 
+    /* El perfil de accesibilidad es opcional: si no se marca nada queda
+       vacío y la aplicación funciona igual. Los campos sueltos (tipo,
+       espacioSilla…) se derivan de él para que el resto de la app siga
+       leyendo lo mismo de siempre. */
+    const a11y = collectA11yProfile('c-a11y-profile');
+    const legacy = legacyFieldsFromA11y(a11y);
+
     const perfil = {
       uid: user.uid,
       nombre: document.getElementById('c-nombre').value.trim(),
@@ -1749,11 +2033,12 @@ async function handleRegisterClient(e){
       telefono: document.getElementById('c-tel').value.trim(),
       correo: email,
       foto: pendingProfilePhoto || null,
-      tipo: document.getElementById('c-tipo').value,
-      espacioSilla: document.getElementById('c-espacio').checked,
-      ayudaAbordar: document.getElementById('c-ayuda').checked,
-      mascota: document.getElementById('c-mascota').checked,
-      tipoMascota: document.getElementById('c-tipo-mascota').value.trim(),
+      perfilAccesibilidad: a11y,
+      tipo: legacy.tipo,
+      espacioSilla: legacy.espacioSilla,
+      ayudaAbordar: legacy.ayudaAbordar,
+      mascota: legacy.mascota,
+      tipoMascota: legacy.tipoMascota,
       observaciones: document.getElementById('c-obs').value.trim(),
       contactoNombre: document.getElementById('c-contacto-nombre').value.trim(),
       contactoRelacion: document.getElementById('c-contacto-relacion').value.trim(),
@@ -1776,6 +2061,7 @@ async function handleRegisterClient(e){
     tripHistory = [];
     pendingProfilePhoto = null;
     document.getElementById('form-client').reset();
+    renderA11yProfileForm('c-a11y-profile', emptyA11yProfile());
     updateAvatarPreview();
 
     announce("Cuenta creada. Bienvenido " + perfil.nombre);
@@ -1812,46 +2098,95 @@ async function handleLogin(e){
   return false;
 }
 
+/* ---------- Cuenta de demostración ----------
+   Credenciales fijas para la sustentación del proyecto. Se definen una sola
+   vez aquí y se usan tanto para rellenar el formulario como para autenticar
+   contra Firebase; el registro y el inicio de sesión normales no cambian. */
+const DEMO_ACCOUNT = {
+  email: 'torion.siyon@forliion.com',
+  password: 'tfw}7y~gUPn}WgX'
+};
+
+/* Perfil que acompaña a la cuenta de demostración: trae necesidades en las
+   tres categorías para que el algoritmo de compatibilidad tenga algo real
+   que comparar durante la presentación. */
+function demoProfile(uid){
+  const a11y = {
+    movilidad: ['silla_electrica','espacio_silla','fijacion','rampa','asistencia_fisica','tiempo_abordar'],
+    comunicacion: ['baja_vision','instrucciones_voz'],
+    cognitivo: ['reconocer_conductor'],
+    otra: ''
+  };
+  const legacy = legacyFieldsFromA11y(a11y);
+  return {
+    uid,
+    nombre: 'Usuario de Demostración',
+    doc: '1000000001',
+    nacimiento: '1994-05-18',
+    telefono: '300 123 4567',
+    correo: DEMO_ACCOUNT.email,
+    foto: null,
+    perfilAccesibilidad: a11y,
+    tipo: legacy.tipo,
+    espacioSilla: legacy.espacioSilla,
+    ayudaAbordar: legacy.ayudaAbordar,
+    mascota: legacy.mascota,
+    tipoMascota: legacy.tipoMascota,
+    observaciones: 'Cuenta de demostración del proyecto AccessRide. Uso silla de ruedas eléctrica y prefiero que me avisen en voz alta al llegar.',
+    contactoNombre: 'Ana Ríos',
+    contactoRelacion: 'Hermana',
+    contactoTelefono: '300 765 4321',
+    esDemo: true,
+    preferencias: {
+      tema: document.documentElement.getAttribute('data-theme') || 'light',
+      contraste: document.documentElement.getAttribute('data-contrast') || 'normal'
+    },
+    creadoEn: serverTimestamp(),
+    actualizadoEn: serverTimestamp()
+  };
+}
+
 async function handleDemoLogin(){
   const btn = document.getElementById('btn-demo-login');
   clearBanner('login-banner');
-  setButtonLoading(btn, true, 'Creando cuenta de prueba…');
-  const n = Math.floor(Math.random()*100000);
-  const email = "prueba" + n + "-" + Date.now() + "@demo.accessride.co";
-  const password = "demo123456";
+
+  /* Primero se rellenan los campos, para que en la demostración se vea de
+     dónde salen el correo y la contraseña. */
+  const emailField = document.getElementById('login-email');
+  const passField = document.getElementById('login-pass');
+  if(emailField) emailField.value = DEMO_ACCOUNT.email;
+  if(passField) passField.value = DEMO_ACCOUNT.password;
+
+  setButtonLoading(btn, true, 'Entrando con la cuenta de demostración…');
   try{
-    const cred = await auth.createUserWithEmailAndPassword(email, password);
-    const perfil = {
-      uid: cred.user.uid,
-      nombre: "Usuario de Prueba",
-      doc: "0000" + n,
-      nacimiento: "1990-01-01",
-      telefono: "300 000 " + String(n).padStart(4,'0').slice(-4),
-      correo: email,
-      foto: null,
-      tipo: "movilidad_reducida",
-      espacioSilla: true,
-      ayudaAbordar: false,
-      mascota: false,
-      tipoMascota: "",
-      observaciones: "Cuenta de prueba generada automáticamente para explorar la aplicación.",
-      contactoNombre: "Contacto de Prueba",
-      contactoRelacion: "Familiar",
-      contactoTelefono: "300 000 0000",
-      esDemo: true,
-      preferencias: {
-        tema: document.documentElement.getAttribute('data-theme') || 'light',
-        contraste: document.documentElement.getAttribute('data-contrast') || 'normal'
-      },
-      creadoEn: serverTimestamp(),
-      actualizadoEn: serverTimestamp()
-    };
-    await db.collection(USERS_COLLECTION).doc(cred.user.uid).set(perfil);
-    session = {uid:cred.user.uid, email};
-    currentProfile = perfil;
+    let cred;
+    try{
+      cred = await auth.signInWithEmailAndPassword(DEMO_ACCOUNT.email, DEMO_ACCOUNT.password);
+    }catch(err){
+      /* La primera vez que se usa en un proyecto de Firebase nuevo la cuenta
+         todavía no existe: se crea con las mismas credenciales fijas. */
+      if(err && (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential')){
+        cred = await auth.createUserWithEmailAndPassword(DEMO_ACCOUNT.email, DEMO_ACCOUNT.password);
+      }else{
+        throw err;
+      }
+    }
+
+    const ref = db.collection(USERS_COLLECTION).doc(cred.user.uid);
+    const snap = await ref.get();
+    if(snap.exists){
+      currentProfile = snap.data();
+    }else{
+      currentProfile = demoProfile(cred.user.uid);
+      await ref.set(currentProfile);
+    }
+
+    session = {uid:cred.user.uid, email:DEMO_ACCOUNT.email};
     authRestoreDone = true;
-    tripHistory = [];
-    announce("Ingresaste con una cuenta de prueba");
+    applyProfilePreferences(currentProfile);
+    await loadTripHistory().catch(()=>{ tripHistory = []; });
+    if(passField) passField.value = '';
+    announce("Ingresaste con la cuenta de demostración");
     goTo('screen-location');
   }catch(err){
     console.error(err);
@@ -1979,6 +2314,13 @@ function reverseGeocode(lat,lng){
 }
 
 function enterApp(){
+  /* La pregunta por la interfaz simplificada aparece justo después de
+     conceder la ubicación, y solo la primera vez: luego la elección queda
+     guardada y se puede cambiar desde Configuración. */
+  if(!simpleUIDecided()){
+    goTo('screen-simple-choice');
+    return;
+  }
   goTo('screen-client-home');
 }
 
@@ -2046,7 +2388,10 @@ function placeNearbyDrivers(){
     const lat = jitter(userLatLng.lat, 400 + i*180);
     const lng = jitter(userLatLng.lng, 400 + i*180);
     const distance = haversine(userLatLng.lat, userLatLng.lng, lat, lng);
-    return {...t, id:i, lat, lng, distance};
+    /* Capacidades detalladas, experiencia y operadores asociados: se derivan
+       de la placa, así el mismo conductor conserva siempre lo mismo. */
+    const extra = buildDriverProfile(t);
+    return {...t, ...extra, id:i, lat, lng, distance, etaMin: Math.max(2, Math.round(distance*3.2))};
   }).sort((a,b)=>a.distance-b.distance);
 
   generatedDrivers.forEach(d=>{
@@ -2061,42 +2406,105 @@ function placeNearbyDrivers(){
 
 function renderNearbyList(){
   const box = document.getElementById('nearby-drivers-list');
-  box.innerHTML = generatedDrivers.slice(0,4).map(d=>driverCardHTML(d)).join('');
+  /* La lista de cercanos ya muestra la compatibilidad con el perfil, para que
+     se vea antes incluso de pedir el viaje. */
+  const ranked = rankDrivers(currentProfile || {}, generatedDrivers);
+  box.innerHTML = ranked.slice(0,4).map(d=>driverCardHTML(d, {interop:false})).join('');
 }
 
 function driverCardHTML(d, opts){
   opts = opts || {};
   const recommended = opts.recommended;
   const chosen = opts.chosen;
-  const reasons = opts.reasons;
   const selectable = opts.selectable;
+  const showCompat = opts.compat !== false && d.compat;
   const tags = d.adaptations.map(a=>`<span class="pill pill-teal">${ADAPTATION_LABELS[a]}</span>`).join(' ');
   const petTag = d.pet ? `<span class="pill pill-green">🐾 Pet Friendly</span>` : '';
   const badge = chosen
     ? '<div class="chosen-badge">✓ Conductor elegido</div>'
-    : (recommended ? '<div class="recommended-badge">⭐ Recomendado para ti</div>' : '');
+    : (recommended ? '<div class="recommended-badge">⭐ El más compatible contigo</div>' : '');
   const classes = ['driver-card'];
   if(recommended || chosen) classes.push('recommended');
   if(chosen) classes.push('chosen');
   if(selectable) classes.push('selectable');
+  if(d.compat && d.compat.essentialUnmet) classes.push('partial');
 
   const interactiveAttrs = selectable
     ? `role="button" tabindex="0" aria-pressed="${chosen?'true':'false'}"
        onclick="selectTripDriver(${d.id})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); selectTripDriver(${d.id});}"`
     : '';
+  const ariaLabel = selectable
+    ? escapeHtml(d.name) + (d.compat ? `, ${d.compat.percent} por ciento de compatibilidad` : '') + (chosen ? ', conductor elegido' : ', tocar para elegir')
+    : '';
 
   return `
-  <div class="${classes.join(' ')}" ${interactiveAttrs} aria-label="${selectable ? (escapeHtml(d.name) + (chosen ? ', conductor elegido' : ', tocar para elegir')) : ''}">
+  <div class="${classes.join(' ')}" ${interactiveAttrs} aria-label="${ariaLabel}">
     <div class="driver-avatar">${avatarImg(d.name)}</div>
     <div class="driver-meta">
       ${badge}
       <strong>${d.name}</strong> — ${d.rating.toFixed(1)}★<br>
       <span class="help" style="margin:0;">${d.vehicle} · ${d.plate} · ${d.distance.toFixed(1)} km</span>
       <div class="driver-tags">${tags} ${petTag}</div>
-      ${reasons ? `<ul class="why-list">${reasons.map(r=>`<li>${r}</li>`).join('')}</ul>` : ''}
+      ${showCompat ? compatBlockHTML(d, !!opts.expandCompat) : ''}
+      ${opts.interop !== false ? interopBlockHTML(d) : ''}
       ${selectable ? `<button type="button" class="btn ${chosen?'btn-primary':'btn-outline'} btn-sm pick-driver-btn" onclick="event.stopPropagation(); selectTripDriver(${d.id})">${chosen?'Conductor elegido':'Elegir este conductor'}</button>` : ''}
     </div>
   </div>`;
+}
+
+/* Bloque de compatibilidad: porcentaje, barra, resumen en una línea y el
+   detalle de qué se cumple y qué no. El detalle va dentro de un <details>
+   para que la tarjeta no crezca de más en pantallas pequeñas. */
+function compatBlockHTML(d, expanded){
+  const c = d.compat;
+  if(!c) return '';
+  const metItems = c.met.map(m=>`<li>${escapeHtml(capitalize(m.text))}${m.essential ? ' <strong>(indispensable)</strong>' : ''}</li>`).join('');
+  const missItems = c.missing.map(m=>`<li class="miss">${escapeHtml(capitalize(m.text))}${m.essential ? ' <strong>(indispensable)</strong>' : ''}</li>`).join('');
+  const secItems = c.secondaryNotes.map(s=>`<li class="sec">${escapeHtml(capitalize(s))}</li>`).join('');
+  const warn = c.essentialUnmet
+    ? `<span class="compat-warn">Este vehículo no cubre una necesidad indispensable de tu perfil. Elígelo solo si sabes que te sirve.</span>`
+    : '';
+  return `
+    <div class="compat-head">
+      <span class="compat-score">${c.percent}<span class="pct">&thinsp;%</span></span>
+      <span class="compat-label">de compatibilidad con tu perfil</span>
+    </div>
+    <div class="compat-bar compat-level-${c.level}" role="img" aria-label="Compatibilidad del ${c.percent} por ciento"><i style="width:${c.percent}%"></i></div>
+    <p class="compat-summary">${escapeHtml(c.headline)}</p>
+    ${warn}
+    <details class="compat-details" ${expanded ? 'open' : ''}>
+      <summary class="compat-toggle">Ver por qué</summary>
+      <ul class="compat-list">
+        ${metItems || '<li class="sec">Sin necesidades registradas en tu perfil de accesibilidad.</li>'}
+        ${missItems}
+        ${secItems}
+      </ul>
+    </details>`;
+}
+
+/* Interoperabilidad simulada: AccessRide se presenta como la capa que
+   consulta otros operadores de transporte y encuentra el vehículo a través
+   de ellos, en vez de ser una aplicación de transporte más. */
+function interopBlockHTML(d){
+  const sources = d.sources || [];
+  if(!sources.length) return '';
+  const lines = sources.map((s,i)=>{
+    const key = i === 0 ? 'Vehículo encontrado mediante' : (i === 1 ? 'Servicio compatible' : 'Operador asociado');
+    return `<li><b>${key}:</b> ${escapeHtml(s)}</li>`;
+  }).join('');
+  return `
+    <div class="interop">
+      <div class="interop-title">🔗 Servicios compatibles / Interoperabilidad
+        <span class="interop-sim">Simulación de interoperabilidad</span>
+      </div>
+      <ul class="interop-rows">${lines}</ul>
+      <p class="interop-note">AccessRide consulta varios operadores de transporte y muestra el vehículo que mejor se ajusta a tu perfil. Esta conexión es demostrativa y no representa una integración real con las APIs de esas empresas.</p>
+    </div>`;
+}
+
+function capitalize(s){
+  s = String(s||'');
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 function haversine(lat1,lon1,lat2,lon2){
@@ -2226,6 +2634,7 @@ function geocodeAddress(address){
 const addrAutocomplete = {
   'pickup-manual': {timer:null, controller:null, results:[], activeIndex:-1, selected:null, seq:0},
   'dest-address': {timer:null, controller:null, results:[], activeIndex:-1, selected:null, seq:0},
+  'simple-dest-input': {timer:null, controller:null, results:[], activeIndex:-1, selected:null, seq:0},
 };
 
 function onAddressInput(inputId){
@@ -2451,8 +2860,8 @@ function renderDriverChoiceList(){
   box.innerHTML = currentTrip.rankedDrivers.map(d=>driverCardHTML(d, {
     recommended: d.id === currentTrip.recommendedId,
     chosen: d.id === chosenId,
-    reasons: d.reasons,
-    selectable: true
+    selectable: true,
+    expandCompat: d.id === currentTrip.recommendedId
   })).join('');
 }
 
@@ -2465,7 +2874,8 @@ function selectTripDriver(driverId){
   if(!picked) return;
   currentTrip.chosenDriver = picked;
   renderDriverChoiceList();
-  announce("Elegiste a " + picked.name + " como tu conductor.");
+  announce("Elegiste a " + picked.name + " como tu conductor. " +
+    (picked.compat ? picked.compat.percent + " por ciento de compatibilidad con tu perfil." : ""));
 }
 
 function drawRoutePreview(pickup, dest, coords){
@@ -2495,44 +2905,23 @@ function formatCOP(n){
   return "$"+Math.round(n).toLocaleString('es-CO')+" COP";
 }
 
-/* Compatibility + matching algorithm.
-   El puntaje de compatibilidad sigue siendo la base (rampa/elevador, apoyo
-   visual/auditivo, mascota, distancia, calificación), pero se le suma un
-   pequeño factor aleatorio para que, entre varios conductores igualmente
-   compatibles, no gane siempre el mismo. Así "recomendado" varía de una
-   solicitud a otra en vez de converger siempre en un único nombre. */
+/* Algoritmo de emparejamiento pasajero–conductor.
+   Cada conductor recibe un porcentaje de compatibilidad calculado contra el
+   perfil de accesibilidad del pasajero (ver computeCompatibility). El orden
+   respeta esa jerarquía: primero quienes cubren todas las necesidades
+   indispensables, después el porcentaje, y solo al final la distancia como
+   desempate. Así la cercanía nunca desplaza a una necesidad indispensable. */
 function rankDrivers(client, drivers){
-  const needsRampOrLift = ['silla_manual','silla_electrica'].includes(client.tipo) || client.espacioSilla;
-  const needsVisual = client.tipo==='visual';
-  const needsAuditory = client.tipo==='auditiva';
-  const needsHelp = client.ayudaAbordar;
-  const needsPet = client.mascota;
-
-  let pool = drivers.filter(d=>{
-    if(needsPet && !d.pet) return false;
-    return true;
+  const pool = drivers.map(d=>{
+    const compat = computeCompatibility(client, d);
+    return {...d, compat, score: compat.percent};
   });
 
-  pool = pool.map(d=>{
-    let score = 0;
-    const reasons = [];
-    if(needsRampOrLift && (d.adaptations.includes('rampa')||d.adaptations.includes('elevador'))){ score+=40; reasons.push("Su vehículo tiene rampa o elevador para silla de ruedas."); }
-    if(client.espacioSilla && d.adaptations.includes('espacio')){ score+=15; reasons.push("Cuenta con espacio amplio para silla de ruedas."); }
-    if(needsVisual && d.adaptations.includes('visual')){ score+=30; reasons.push("El conductor está preparado para asistencia a personas con discapacidad visual."); }
-    if(needsAuditory && d.adaptations.includes('auditiva')){ score+=30; reasons.push("El conductor está preparado para asistencia a personas con discapacidad auditiva."); }
-    if(needsHelp && d.adaptations.includes('ayuda')){ score+=20; reasons.push("Ofrece ayuda para subir y bajar del vehículo."); }
-    if(needsPet && d.pet){ score+=15; reasons.push("Vehículo Pet Friendly: acepta animales de compañía."); }
-    score += Math.max(0, 10 - d.distance);
-    reasons.push(`Está a solo ${d.distance.toFixed(1)} km de ti.`);
-    score += (d.rating-4.5)*10;
-    reasons.push(`Calificación de ${d.rating.toFixed(1)} estrellas.`);
-    // Ruido aleatorio pequeño: no cambia quién es claramente el mejor
-    // candidato, pero desempata entre conductores con puntajes parecidos.
-    score += Math.random()*8;
-    return {...d, score, reasons};
+  pool.sort((a,b)=>{
+    if(a.compat.essentialUnmet !== b.compat.essentialUnmet) return a.compat.essentialUnmet ? 1 : -1;
+    if(b.compat.percent !== a.compat.percent) return b.compat.percent - a.compat.percent;
+    return a.distance - b.distance;
   });
-
-  pool.sort((a,b)=>b.score-a.score);
   return pool;
 }
 
@@ -2768,11 +3157,21 @@ function fillProfile(){
       <p><strong>Correo:</strong> ${escapeHtml(c.correo||'—')}</p>
     </div>
     <div class="card" style="margin-bottom:.8em;">
-      <h3 style="margin-bottom:.6em;">Necesidades de accesibilidad</h3>
-      <p><strong>Espacio para silla:</strong> ${c.espacioSilla?'Sí':'No'}</p>
-      <p><strong>Ayuda al abordar:</strong> ${c.ayudaAbordar?'Sí':'No'}</p>
-      <p><strong>Animal de compañía:</strong> ${c.mascota?('Sí — '+escapeHtml(c.tipoMascota||'')):'No'}</p>
-      <p><strong>Observaciones:</strong> ${escapeHtml(c.observaciones||'—')}</p>
+      <h3 style="margin-bottom:.2em;">Perfil de accesibilidad</h3>
+      <p class="help" style="margin-top:0;">Marca o desmarca lo que necesites. Con esto buscamos el conductor y el vehículo más compatibles contigo.</p>
+      <div id="profile-a11y-banner"></div>
+      <div id="p-a11y-profile"></div>
+
+      <label for="profile-obs">Observaciones para el conductor</label>
+      <textarea id="profile-obs" rows="3" placeholder="Ej: uso audífonos, prefiero que me hablen de frente">${escapeHtml(c.observaciones||'')}</textarea>
+
+      <button class="btn btn-primary btn-block" id="btn-save-a11y" style="margin-top:1em;" onclick="saveA11yProfile()">Guardar perfil de accesibilidad</button>
+    </div>
+
+    <div class="card" style="margin-bottom:.8em;">
+      <h3 style="margin-bottom:.2em;">Lo que ve el conductor</h3>
+      <p class="help" style="margin-top:0;">Solo estas necesidades se comparten, para que pueda preparar el viaje.</p>
+      <div id="profile-driver-view"></div>
     </div>
     <div class="card">
       <h3 style="margin-bottom:.6em;">Contacto de emergencia</h3>
@@ -2787,31 +3186,71 @@ function fillProfile(){
       <button class="btn btn-outline btn-block" id="btn-save-trusted" style="margin-top:1em;" onclick="saveTrustedContact()">Guardar contacto</button>
     </div>
   `;
+  renderA11yProfileForm('p-a11y-profile', normalizeA11yProfile(c));
+  renderDriverViewList();
 }
+
+/* Muestra exactamente lo que se le comparte al conductor, para que el
+   pasajero sepa qué información sale de su perfil. */
+function renderDriverViewList(){
+  const box = document.getElementById('profile-driver-view');
+  if(!box) return;
+  const needs = driverVisibleNeeds(currentProfile || {});
+  box.innerHTML = needs.length
+    ? `<div class="a11y-selected-summary">${needs.map(n=>`<span class="pill pill-teal">${escapeHtml(n)}</span>`).join('')}</div>`
+    : `<p class="help" style="margin:0;">Por ahora no se comparte ninguna necesidad con el conductor.</p>`;
+}
+
+async function saveA11yProfile(){
+  if(!session || !session.uid) return;
+  const btn = document.getElementById('btn-save-a11y');
+  const a11y = collectA11yProfile('p-a11y-profile');
+  const legacy = legacyFieldsFromA11y(a11y);
+  const datos = {
+    perfilAccesibilidad: a11y,
+    tipo: legacy.tipo,
+    espacioSilla: legacy.espacioSilla,
+    ayudaAbordar: legacy.ayudaAbordar,
+    mascota: legacy.mascota,
+    tipoMascota: legacy.tipoMascota,
+    observaciones: (document.getElementById('profile-obs')||{}).value ? document.getElementById('profile-obs').value.trim() : '',
+    actualizadoEn: serverTimestamp()
+  };
+  setButtonLoading(btn, true, 'Guardando…');
+  try{
+    await db.collection(USERS_COLLECTION).doc(session.uid).set(datos, {merge:true});
+    currentProfile = {...currentProfile, ...datos};
+    renderDriverViewList();
+    /* Los conductores cercanos se vuelven a evaluar con el perfil nuevo. */
+    if(generatedDrivers.length) renderNearbyList();
+    const n = a11yProfileCount(a11y);
+    showBanner('profile-a11y-banner',
+      n ? `Perfil de accesibilidad guardado con ${n} ${n===1?'necesidad':'necesidades'}. Ya lo usamos para buscarte vehículo.`
+        : 'Perfil de accesibilidad guardado sin necesidades seleccionadas.', true);
+  }catch(err){
+    console.error(err);
+    showBanner('profile-a11y-banner', firebaseErrorMessage(err));
+  }finally{
+    setButtonLoading(btn, false);
+  }
+}
+
 function labelTipo(t){
   const map = {silla_manual:"Silla de ruedas manual", silla_electrica:"Silla de ruedas eléctrica", movilidad_reducida:"Movilidad reducida", visual:"Discapacidad visual", auditiva:"Discapacidad auditiva", cognitiva:"Discapacidad cognitiva", otra:"Otra necesidad"};
   return map[t]||"—";
 }
 
-/* ---------- Emergency ---------- */
-function triggerEmergency(){
-  openModal('modal-emergency');
-  announce("Alerta de emergencia activada");
-  /* Deja constancia de la alerta en Firestore para el panel de soporte. */
-  if(session && session.uid){
-    db.collection(USERS_COLLECTION).doc(session.uid).collection('alertas').add({
-      tipo: 'sos',
-      ubicacion: userLatLng ? {lat:userLatLng.lat, lng:userLatLng.lng} : null,
-      direccion: userAddress || '',
-      conductor: activeRide ? activeRide.driver.name : null,
-      creadoEn: serverTimestamp()
-    }).catch(err=>console.warn('No se registró la alerta:', err));
-  }
-}
+/* ---------- Emergency ----------
+   El flujo completo (confirmación, alerta activa y acciones) vive en el
+   bloque "INTERFAZ DE EMERGENCIA (SOS)" más abajo. */
 function callTrustedContact(){
-  const tel = currentProfile && currentProfile.contactoTelefono;
-  announce("Llamando a tu contacto de confianza (simulado)");
-  alert("Llamando a tu contacto de confianza" + (tel ? " ("+tel+")" : "") + "…");
+  const c = currentProfile || {};
+  const nombre = c.contactoNombre || 'tu contacto de emergencia';
+  const tel = c.contactoTelefono;
+  const msg = `Llamando a ${nombre}${tel ? ' (' + tel + ')' : ''} — simulación`;
+  announce(msg);
+  if(typeof window.a11yToast === 'function') window.a11yToast(msg, '', '📞');
+  else alert(msg + '…');
 }
 async function saveTrustedContact(){
   if(!session || !session.uid) return;
@@ -2835,10 +3274,755 @@ async function saveTrustedContact(){
   }
 }
 
+
+/* ==============================================================================
+   1. PERFIL DE ACCESIBILIDAD
+   Catálogo de necesidades agrupadas en Movilidad, Comunicación y Cognitivo.
+   Cada opción declara qué le pide al vehículo y al conductor (`req`), con qué
+   peso, y si es indispensable. `driverLabel` existe solo en las necesidades
+   que de verdad cambian cómo se presta el servicio: son las únicas que ve el
+   conductor. Todo el resto queda únicamente del lado del pasajero.
+   ============================================================================== */
+
+/* Requisito: {caps:[...], w:peso, essential:true|false, label:'texto'}
+   Se cumple si el conductor tiene CUALQUIERA de las capacidades de `caps`. */
+const A11Y_CATALOG = {
+  movilidad: {
+    label: 'Movilidad', icon: '♿',
+    hint: 'Silla de ruedas, apoyos para caminar, rampa, elevador y ayuda para abordar.',
+    options: [
+      {id:'dificultad_caminar', label:'Dificultad para caminar', driverLabel:'Camina con dificultad',
+        req:[{caps:['asistencia_fisica'], w:5}, {caps:['tiempo_flexible'], w:3}]},
+      {id:'movilidad_reducida', label:'Movilidad reducida', driverLabel:'Movilidad reducida',
+        req:[{caps:['espacio_amplio'], w:3}, {caps:['asistencia_fisica'], w:3}]},
+      {id:'baston', label:'Uso bastón', driverLabel:'Viaja con bastón',
+        req:[{caps:['asistencia_fisica'], w:3}]},
+      {id:'muletas', label:'Uso muletas', driverLabel:'Viaja con muletas',
+        req:[{caps:['espacio_dispositivos'], w:3}, {caps:['asistencia_fisica'], w:3}]},
+      {id:'caminador', label:'Uso caminador o andador', driverLabel:'Viaja con caminador',
+        req:[{caps:['espacio_dispositivos'], w:5}, {caps:['asistencia_fisica'], w:3}]},
+      {id:'protesis', label:'Uso prótesis',
+        req:[{caps:['tiempo_flexible'], w:3}]},
+      {id:'silla_manual', label:'Uso silla de ruedas manual', driverLabel:'Usa silla de ruedas manual',
+        req:[{caps:['rampa','elevador'], w:10, essential:true, label:'Vehículo con rampa o elevador'},
+             {caps:['espacio_amplio'], w:5}]},
+      {id:'silla_electrica', label:'Uso silla de ruedas eléctrica', driverLabel:'Usa silla de ruedas eléctrica',
+        req:[{caps:['rampa','elevador'], w:12, essential:true, label:'Vehículo con rampa o elevador'},
+             {caps:['espacio_amplio'], w:6}, {caps:['fijacion'], w:6}]},
+      {id:'silla_no_plegable', label:'Mi silla de ruedas no se puede plegar', driverLabel:'La silla no se pliega',
+        req:[{caps:['silla_sin_plegar'], w:10, essential:true, label:'Transporta la silla sin plegarla'},
+             {caps:['espacio_amplio'], w:4}]},
+      {id:'espacio_silla', label:'Necesito espacio adicional para la silla de ruedas', driverLabel:'Necesita espacio adicional',
+        req:[{caps:['espacio_amplio'], w:6}]},
+      {id:'rampa', label:'Necesito rampa', driverLabel:'Necesita rampa',
+        req:[{caps:['rampa'], w:12, essential:true}]},
+      {id:'elevador', label:'Necesito plataforma elevadora o elevador', driverLabel:'Necesita elevador',
+        req:[{caps:['elevador'], w:12, essential:true}]},
+      {id:'fijacion', label:'Necesito sistema de sujeción para la silla de ruedas', driverLabel:'Necesita sujeción para la silla',
+        req:[{caps:['fijacion'], w:8, essential:true}]},
+      {id:'subir_bajar', label:'Tengo dificultad para subir o bajar del vehículo', driverLabel:'Dificultad para subir y bajar',
+        req:[{caps:['asistencia_fisica'], w:6}, {caps:['tiempo_flexible'], w:3}]},
+      {id:'asistencia_fisica', label:'Necesito asistencia física para abordar', driverLabel:'Necesita asistencia física para abordar',
+        req:[{caps:['asistencia_fisica'], w:10, essential:true}]},
+      {id:'tiempo_abordar', label:'Necesito más tiempo para abordar', driverLabel:'Necesita más tiempo para abordar',
+        req:[{caps:['tiempo_flexible'], w:5}]},
+      {id:'permanecer_pie', label:'Me cuesta permanecer de pie durante el trayecto',
+        req:[{caps:['espacio_amplio'], w:3}, {caps:['tiempo_flexible'], w:3}]},
+      {id:'animal_asistencia', label:'Viajo con perro guía o animal de asistencia', driverLabel:'Viaja con perro guía o animal de asistencia',
+        req:[{caps:['animal_asistencia'], w:10, essential:true, label:'Acepta perro guía o animal de asistencia'}]}
+    ]
+  },
+  comunicacion: {
+    label: 'Comunicación', icon: '💬',
+    hint: 'Cómo prefieres recibir la información y comunicarte con el conductor.',
+    options: [
+      {id:'disc_auditiva', label:'Discapacidad auditiva', driverLabel:'Discapacidad auditiva',
+        req:[{caps:['exp_auditiva'], w:6}, {caps:['texto'], w:5}]},
+      {id:'sordera', label:'Sordera', driverLabel:'Persona sorda: comunícate por escrito',
+        req:[{caps:['texto'], w:10, essential:true, label:'Comunicación escrita en la aplicación'},
+             {caps:['exp_auditiva'], w:5}]},
+      {id:'dificultad_auditiva', label:'Dificultad auditiva', driverLabel:'Dificultad auditiva',
+        req:[{caps:['exp_auditiva'], w:5}, {caps:['texto'], w:3}]},
+      {id:'disc_visual', label:'Discapacidad visual', driverLabel:'Discapacidad visual',
+        req:[{caps:['exp_visual'], w:6}, {caps:['guia_verbal'], w:5}]},
+      {id:'ceguera', label:'Ceguera', driverLabel:'Persona ciega: avísale al llegar y guíala con la voz',
+        req:[{caps:['guia_verbal'], w:10, essential:true, label:'Indicaciones habladas al llegar y al abordar'},
+             {caps:['exp_visual'], w:6}, {caps:['asistencia_fisica'], w:4}]},
+      {id:'baja_vision', label:'Baja visión', driverLabel:'Baja visión',
+        req:[{caps:['guia_verbal'], w:4}, {caps:['identificacion_clara'], w:4}]},
+      {id:'leer_visual', label:'Me cuesta leer la información visual',
+        req:[{caps:['guia_verbal'], w:5}]},
+      {id:'instrucciones_voz', label:'Necesito instrucciones por voz', driverLabel:'Prefiere instrucciones habladas',
+        req:[{caps:['guia_verbal'], w:6}]},
+      {id:'info_escrita', label:'Necesito la información por escrito', driverLabel:'Prefiere información escrita',
+        req:[{caps:['texto'], w:6}]},
+      {id:'pref_texto', label:'Prefiero comunicarme por texto', driverLabel:'Prefiere el chat escrito',
+        req:[{caps:['texto'], w:6}]},
+      {id:'dificultad_hablar', label:'Tengo dificultad para hablar', driverLabel:'Dificultad para hablar',
+        req:[{caps:['texto'], w:6}]},
+      {id:'no_verbal', label:'No puedo comunicarme verbalmente', driverLabel:'No se comunica verbalmente: usa el chat',
+        req:[{caps:['texto'], w:10, essential:true, label:'Comunicación escrita en la aplicación'}]},
+      {id:'lengua_senas', label:'Prefiero comunicarme en lengua de señas', driverLabel:'Se comunica en lengua de señas',
+        req:[{caps:['lengua_senas'], w:8}, {caps:['texto'], w:3}]},
+      {id:'interprete', label:'Necesito acompañante o intérprete para comunicarme', driverLabel:'Viaja con intérprete o acompañante',
+        req:[{caps:['interprete_ok'], w:8, essential:true, label:'Admite acompañante o intérprete'},
+             {caps:['acompanante'], w:4}]},
+      {id:'solo_auditivo_visual', label:'Me cuesta entender indicaciones solo habladas o solo visuales',
+        req:[{caps:['texto'], w:4}, {caps:['guia_verbal'], w:4}]}
+    ]
+  },
+  cognitivo: {
+    label: 'Cognitivo', icon: '🧠',
+    hint: 'Ritmo, claridad de las instrucciones y entorno durante el viaje.',
+    options: [
+      {id:'instrucciones_complejas', label:'Me cuestan las instrucciones complejas', driverLabel:'Explícale el viaje de forma sencilla',
+        req:[{caps:['instrucciones_simples'], w:6}]},
+      {id:'instrucciones_simples', label:'Necesito instrucciones simples y paso a paso', driverLabel:'Necesita instrucciones paso a paso',
+        req:[{caps:['instrucciones_simples'], w:6}]},
+      {id:'orientacion', label:'Tengo dificultad de orientación o navegación',
+        req:[{caps:['apoyo_orientacion'], w:6}]},
+      {id:'apoyo_destino', label:'Necesito apoyo para identificar el destino', driverLabel:'Necesita apoyo para identificar el destino',
+        req:[{caps:['apoyo_orientacion'], w:6}]},
+      {id:'procesar_info', label:'Me cuesta procesar información rápidamente',
+        req:[{caps:['instrucciones_simples'], w:4}, {caps:['tiempo_flexible'], w:4}]},
+      {id:'tiempo_responder', label:'Necesito más tiempo para responder', driverLabel:'Necesita más tiempo para responder',
+        req:[{caps:['tiempo_flexible'], w:5}]},
+      {id:'sensibilidad', label:'Soy sensible a estímulos visuales o sonoros', driverLabel:'Sensible a luces y sonidos fuertes',
+        req:[{caps:['entorno_tranquilo'], w:6}]},
+      {id:'entorno_tranquilo', label:'Necesito un entorno tranquilo', driverLabel:'Necesita un entorno tranquilo',
+        req:[{caps:['entorno_tranquilo'], w:8, essential:true, label:'Vehículo silencioso, sin música ni luces fuertes'}]},
+      {id:'reconocer_conductor', label:'Me cuesta reconocer al conductor o el vehículo', driverLabel:'Identifícate claramente al llegar',
+        req:[{caps:['identificacion_clara'], w:6}]},
+      {id:'acompanante', label:'Necesito viajar con acompañante', driverLabel:'Viaja con acompañante',
+        req:[{caps:['acompanante'], w:8, essential:true, label:'Espacio para acompañante'}]}
+    ]
+  }
+};
+
+/* Cómo se nombra cada capacidad del conductor y del vehículo en los textos
+   de compatibilidad que ve el pasajero. */
+const CAP_LABELS = {
+  rampa:'vehículo con rampa',
+  elevador:'plataforma elevadora',
+  espacio_amplio:'espacio interior amplio',
+  silla_sin_plegar:'transporta la silla sin plegarla',
+  fijacion:'sistema de sujeción para la silla',
+  espacio_dispositivos:'espacio para dispositivos de movilidad',
+  asistencia_fisica:'conductor con experiencia en asistencia para abordar',
+  tiempo_flexible:'toma el tiempo que necesites para abordar',
+  exp_visual:'experiencia con pasajeros con discapacidad visual',
+  guia_verbal:'indicaciones habladas durante el viaje',
+  exp_auditiva:'experiencia con pasajeros sordos',
+  texto:'comunicación escrita desde la aplicación',
+  lengua_senas:'lengua de señas básica',
+  interprete_ok:'admite acompañante o intérprete',
+  instrucciones_simples:'explica el viaje paso a paso',
+  entorno_tranquilo:'vehículo silencioso, sin música ni luces fuertes',
+  apoyo_orientacion:'ayuda a identificar el destino',
+  identificacion_clara:'se identifica claramente al llegar',
+  animal_asistencia:'acepta perro guía o animal de asistencia',
+  acompanante:'espacio para acompañante',
+  conoce_mecanismos:'conoce el manejo de la rampa y el elevador'
+};
+
+const A11Y_DISCLAIMER = 'El perfil de accesibilidad es voluntario y permite a AccessRide buscar opciones de transporte que se adapten mejor a tus necesidades. El conductor podrá visualizar únicamente las necesidades de accesibilidad que tengan mayor influencia en la prestación del servicio, con el objetivo de preparar adecuadamente el viaje, y el sistema utilizará esta información para buscar un conductor y vehículo con el mayor nivel de compatibilidad posible. AccessRide no pretende definir ni limitar al usuario por su discapacidad; estas opciones existen únicamente para facilitar una experiencia de transporte accesible y personalizada.';
+
+function a11yOption(id){
+  for(const key of Object.keys(A11Y_CATALOG)){
+    const found = A11Y_CATALOG[key].options.find(o=>o.id===id);
+    if(found) return found;
+  }
+  return null;
+}
+
+/* Perfil vacío con la forma que se guarda en Firestore. */
+function emptyA11yProfile(){
+  return {movilidad:[], comunicacion:[], cognitivo:[], otra:''};
+}
+
+/* Normaliza cualquier perfil (venga de Firestore, de una cuenta antigua o
+   esté incompleto) al formato esperado. Las cuentas creadas antes de esta
+   versión se traducen desde sus campos sueltos (tipo, espacioSilla…). */
+function normalizeA11yProfile(profile){
+  const p = emptyA11yProfile();
+  const saved = profile && profile.perfilAccesibilidad;
+  if(saved && typeof saved === 'object'){
+    ['movilidad','comunicacion','cognitivo'].forEach(cat=>{
+      if(Array.isArray(saved[cat])) p[cat] = saved[cat].filter(id=>a11yOption(id));
+    });
+    p.otra = typeof saved.otra === 'string' ? saved.otra : '';
+    return p;
+  }
+  if(!profile) return p;
+  const legacy = {
+    silla_manual:['movilidad','silla_manual'], silla_electrica:['movilidad','silla_electrica'],
+    movilidad_reducida:['movilidad','movilidad_reducida'], visual:['comunicacion','disc_visual'],
+    auditiva:['comunicacion','disc_auditiva'], cognitiva:['cognitivo','instrucciones_simples']
+  };
+  const mapped = legacy[profile.tipo];
+  if(mapped) p[mapped[0]].push(mapped[1]);
+  if(profile.espacioSilla && !p.movilidad.includes('espacio_silla')) p.movilidad.push('espacio_silla');
+  if(profile.ayudaAbordar && !p.movilidad.includes('asistencia_fisica')) p.movilidad.push('asistencia_fisica');
+  if(profile.mascota && !p.movilidad.includes('animal_asistencia')) p.movilidad.push('animal_asistencia');
+  return p;
+}
+
+/* Campos sueltos que el resto de la aplicación (historial, tarjetas, perfil)
+   ya usaba. Se derivan del perfil para no romper nada de lo existente. */
+function legacyFieldsFromA11y(p){
+  const has = id => p.movilidad.includes(id) || p.comunicacion.includes(id) || p.cognitivo.includes(id);
+  let tipo = 'otra';
+  if(has('silla_electrica')) tipo = 'silla_electrica';
+  else if(has('silla_manual')) tipo = 'silla_manual';
+  else if(has('ceguera') || has('disc_visual') || has('baja_vision')) tipo = 'visual';
+  else if(has('sordera') || has('disc_auditiva') || has('dificultad_auditiva')) tipo = 'auditiva';
+  else if(has('instrucciones_simples') || has('instrucciones_complejas') || has('procesar_info')) tipo = 'cognitiva';
+  else if(has('movilidad_reducida') || has('dificultad_caminar') || has('baston') || has('muletas') || has('caminador')) tipo = 'movilidad_reducida';
+  return {
+    tipo,
+    espacioSilla: has('espacio_silla') || has('silla_no_plegable') || has('silla_electrica'),
+    ayudaAbordar: has('asistencia_fisica') || has('subir_bajar'),
+    mascota: has('animal_asistencia'),
+    tipoMascota: has('animal_asistencia') ? 'Perro guía o animal de asistencia' : ''
+  };
+}
+
+function a11yProfileCount(p){
+  return p.movilidad.length + p.comunicacion.length + p.cognitivo.length + (p.otra ? 1 : 0);
+}
+
+/* ---------- Formulario de casillas ---------- */
+/* Se pinta desde el catálogo para que registro, perfil y cualquier otra
+   pantalla usen exactamente las mismas opciones. */
+function renderA11yProfileForm(containerId, selected){
+  const box = document.getElementById(containerId);
+  if(!box) return;
+  const p = selected || emptyA11yProfile();
+  const prefix = containerId;
+  const cats = Object.keys(A11Y_CATALOG).map(catKey=>{
+    const cat = A11Y_CATALOG[catKey];
+    const chosen = p[catKey] || [];
+    const opts = cat.options.map(o=>{
+      const id = `${prefix}-${catKey}-${o.id}`;
+      const checked = chosen.includes(o.id) ? 'checked' : '';
+      return `<label class="a11y-opt" for="${id}">
+        <input type="checkbox" id="${id}" data-cat="${catKey}" data-opt="${o.id}" ${checked}
+               onchange="onA11yOptionChange('${prefix}')">
+        <span>${escapeHtml(o.label)}</span>
+      </label>`;
+    }).join('');
+    const n = chosen.length;
+    return `<details class="a11y-cat" ${n ? 'open' : ''}>
+      <summary>
+        <span>${cat.icon} ${cat.label}</span>
+        <span class="a11y-cat-count ${n?'':'empty'}" id="${prefix}-count-${catKey}">${n ? n + ' seleccionadas' : 'Ninguna'}</span>
+      </summary>
+      <div class="a11y-cat-body">
+        <p class="help" style="margin-top:0;">${escapeHtml(cat.hint)}</p>
+        ${opts}
+      </div>
+    </details>`;
+  }).join('');
+
+  box.innerHTML = `
+    ${cats}
+    <label for="${prefix}-otra">Otra necesidad de accesibilidad</label>
+    <input id="${prefix}-otra" type="text" placeholder="Escríbela si no aparece en las listas" value="${escapeHtml(p.otra || '')}">
+    <div class="a11y-disclaimer">
+      <strong>Sobre esta información</strong>
+      ${escapeHtml(A11Y_DISCLAIMER)}
+    </div>`;
+}
+
+function onA11yOptionChange(prefix){
+  Object.keys(A11Y_CATALOG).forEach(catKey=>{
+    const n = document.querySelectorAll(`#${prefix} input[data-cat="${catKey}"]:checked`).length;
+    const pill = document.getElementById(`${prefix}-count-${catKey}`);
+    if(pill){
+      pill.textContent = n ? n + ' seleccionadas' : 'Ninguna';
+      pill.classList.toggle('empty', n === 0);
+    }
+  });
+}
+
+function collectA11yProfile(containerId){
+  const p = emptyA11yProfile();
+  const box = document.getElementById(containerId);
+  if(!box) return p;
+  box.querySelectorAll('input[type="checkbox"][data-opt]:checked').forEach(cb=>{
+    const cat = cb.dataset.cat;
+    if(p[cat]) p[cat].push(cb.dataset.opt);
+  });
+  const otra = document.getElementById(`${containerId}-otra`);
+  p.otra = otra ? otra.value.trim() : '';
+  return p;
+}
+
+/* Lo que ve el conductor: solo las necesidades con `driverLabel`. */
+function driverVisibleNeeds(profile){
+  const p = normalizeA11yProfile(profile);
+  const out = [];
+  ['movilidad','comunicacion','cognitivo'].forEach(cat=>{
+    p[cat].forEach(id=>{
+      const o = a11yOption(id);
+      if(o && o.driverLabel) out.push(o.driverLabel);
+    });
+  });
+  if(p.otra) out.push(p.otra);
+  return out;
+}
+
+/* ==============================================================================
+   2. CAPACIDADES DEL CONDUCTOR Y DEL VEHÍCULO + INTEROPERABILIDAD SIMULADA
+   Se derivan de forma determinista de la placa, así un mismo conductor
+   conserva siempre las mismas capacidades, operadores y experiencia entre
+   solicitudes, sin necesidad de escribirlas a mano una por una.
+   ============================================================================== */
+function seedFromString(str){
+  let h = 2166136261;
+  for(let i=0;i<str.length;i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return Math.abs(h);
+}
+function seededRandom(seed){
+  let x = seed % 2147483647;
+  if(x <= 0) x += 2147483646;
+  return function(){ x = (x * 16807) % 2147483647; return (x - 1) / 2147483646; };
+}
+
+const CAP_FROM_ADAPTATION = {
+  rampa:['rampa','conoce_mecanismos'],
+  elevador:['elevador','conoce_mecanismos','espacio_dispositivos'],
+  espacio:['espacio_amplio','silla_sin_plegar','espacio_dispositivos'],
+  fijacion:['fijacion'],
+  ayuda:['asistencia_fisica','tiempo_flexible'],
+  visual:['exp_visual','guia_verbal','identificacion_clara'],
+  auditiva:['exp_auditiva','texto']
+};
+
+const INTEROP_SOURCES = [
+  'DiDi', 'Uber', 'inDrive', 'Cabify', 'Taxis Libres',
+  'Transporte accesible local', 'Cooperativa de Transporte Adaptado',
+  'Movilidad Incluyente — flota municipal'
+];
+
+function buildDriverProfile(t){
+  const rnd = seededRandom(seedFromString(t.plate));
+  const caps = new Set();
+  (t.adaptations||[]).forEach(a=>(CAP_FROM_ADAPTATION[a]||[]).forEach(c=>caps.add(c)));
+  if(t.pet) caps.add('animal_asistencia');
+  /* Capacidades adicionales (comunicación, ritmo, entorno) repartidas entre
+     la flota: ningún conductor las tiene todas, y por eso el porcentaje de
+     compatibilidad cambia de verdad entre un conductor y otro. */
+  [['texto',.45], ['lengua_senas',.72], ['instrucciones_simples',.42], ['entorno_tranquilo',.55],
+   ['apoyo_orientacion',.5], ['interprete_ok',.4], ['acompanante',.35], ['tiempo_flexible',.45],
+   ['identificacion_clara',.4], ['silla_sin_plegar',.62], ['guia_verbal',.5], ['espacio_dispositivos',.55]
+  ].forEach(([cap, threshold])=>{ if(rnd() > threshold) caps.add(cap); });
+
+  const sources = [];
+  const pool = INTEROP_SOURCES.slice();
+  const count = 1 + Math.floor(rnd()*2);
+  for(let i=0;i<count;i++){
+    const idx = Math.floor(rnd()*pool.length);
+    sources.push(pool.splice(idx,1)[0]);
+  }
+  return {
+    caps: Array.from(caps),
+    experienceYears: 1 + Math.floor(rnd()*12),
+    assistedTrips: 40 + Math.floor(rnd()*860),
+    sources
+  };
+}
+
+/* ==============================================================================
+   3. ALGORITMO DE COMPATIBILIDAD PASAJERO–VEHÍCULO
+   Traduce el perfil de accesibilidad en requisitos, compara contra las
+   capacidades del conductor y devuelve un porcentaje explicable. Las
+   necesidades indispensables mandan: si falta una, el conductor baja al final
+   de la lista aunque esté más cerca o tenga mejor calificación.
+   ============================================================================== */
+function clientRequirements(profile){
+  const p = normalizeA11yProfile(profile);
+  const reqs = [];
+  ['movilidad','comunicacion','cognitivo'].forEach(cat=>{
+    p[cat].forEach(id=>{
+      const opt = a11yOption(id);
+      if(!opt) return;
+      opt.req.forEach(r=>{
+        reqs.push({
+          caps: r.caps,
+          w: r.w,
+          essential: !!r.essential,
+          label: r.label || (CAP_LABELS[r.caps[0]] || r.caps[0]),
+          from: opt.label
+        });
+      });
+    });
+  });
+  /* Un mismo requisito puede venir de varias necesidades (por ejemplo rampa
+     desde "silla manual" y desde "necesito rampa"): se deja una sola vez con
+     el peso mayor, para no inflar el denominador del porcentaje. */
+  const merged = new Map();
+  reqs.forEach(r=>{
+    const key = r.caps.join('|');
+    const prev = merged.get(key);
+    if(!prev || r.w > prev.w || (r.essential && !prev.essential)){
+      merged.set(key, {...r, essential: r.essential || (prev ? prev.essential : false), w: Math.max(r.w, prev ? prev.w : 0)});
+    }
+  });
+  return Array.from(merged.values());
+}
+
+function computeCompatibility(profile, driver){
+  const reqs = clientRequirements(profile);
+  const caps = driver.caps || [];
+  const met = [], missing = [];
+  let totalW = 0, metW = 0, essentialUnmet = false;
+
+  reqs.forEach(r=>{
+    totalW += r.w;
+    const ok = r.caps.some(c=>caps.includes(c));
+    if(ok){
+      metW += r.w;
+      const capName = r.caps.find(c=>caps.includes(c));
+      met.push({text: r.label && r.label !== CAP_LABELS[r.caps[0]] ? r.label : (CAP_LABELS[capName] || capName), essential: r.essential, from: r.from});
+    }else{
+      missing.push({text: r.label, essential: r.essential, from: r.from});
+      if(r.essential) essentialUnmet = true;
+    }
+  });
+
+  /* Factores secundarios: solo pueden mover el resultado unos pocos puntos,
+     nunca por encima de una necesidad indispensable. */
+  const distScore = Math.max(0, Math.min(1, (8 - (driver.distance||0)) / 8));   // 0–1
+  const ratingScore = Math.max(0, Math.min(1, ((driver.rating||4.5) - 4.4) / 0.6));
+  const secondary = distScore*5 + ratingScore*4;  // 0–9
+
+  let percent;
+  if(totalW > 0){
+    percent = Math.round((metW/totalW)*88 + secondary);
+  }else{
+    /* Sin necesidades registradas la compatibilidad se apoya en el servicio
+       general: vehículo disponible, cercanía y calificación. */
+    percent = Math.round(78 + secondary*1.8);
+  }
+  percent = Math.max(32, Math.min(99, percent));
+  if(essentialUnmet) percent = Math.min(percent, 54);
+
+  const level = percent >= 85 ? 'alta' : (percent >= 65 ? 'media' : 'baja');
+
+  const highlights = met.slice().sort((a,b)=>(b.essential?1:0)-(a.essential?1:0)).slice(0,4).map(m=>m.text);
+  const secondaryNotes = [
+    `está a ${(driver.distance||0).toFixed(1)} km de ti`,
+    `calificación de ${(driver.rating||0).toFixed(1)} estrellas`,
+    `${driver.experienceYears} años transportando pasajeros con necesidades de accesibilidad`
+  ];
+  const headline = totalW > 0
+    ? (highlights.length
+        ? `${percent} % de compatibilidad: ${listToText(highlights)}`
+        : `${percent} % de compatibilidad: este vehículo no cubre las necesidades que registraste`)
+    : `${percent} % de compatibilidad: vehículo disponible cerca de ti`;
+
+  return {percent, level, met, missing, essentialUnmet, headline, secondaryNotes, totalRequirements: reqs.length};
+}
+
+function listToText(arr){
+  if(!arr.length) return '';
+  if(arr.length === 1) return arr[0];
+  return arr.slice(0,-1).join(', ') + ' y ' + arr[arr.length-1];
+}
+
+/* ==============================================================================
+   4. INTERFAZ SIMPLIFICADA
+   ============================================================================== */
+const SIMPLE_KEY = 'accessride-simple-ui';
+
+function simpleUIEnabled(){ return document.documentElement.getAttribute('data-simple') === 'on'; }
+function simpleUIDecided(){
+  try{ return localStorage.getItem(SIMPLE_KEY) !== null; }catch(e){ return false; }
+}
+function setSimpleUI(on, silent){
+  document.documentElement.setAttribute('data-simple', on ? 'on' : 'off');
+  try{ localStorage.setItem(SIMPLE_KEY, on ? 'on' : 'off'); }catch(e){}
+  const toggle = document.getElementById('a11y-simple');
+  if(toggle) toggle.checked = !!on;
+  if(!on){
+    /* Al volver al modo normal el mapa estaba oculto y hay que recalcular su
+       tamaño, o Leaflet lo dibuja con 0 píxeles de alto. */
+    setTimeout(()=>{ try{ if(map) map.invalidateSize(); }catch(e){} }, 120);
+  }else{
+    updateSimpleTripStatus();
+  }
+  if(session && session.uid){
+    db.collection(USERS_COLLECTION).doc(session.uid)
+      .set({preferencias:{interfazSimplificada: !!on}, actualizadoEn: serverTimestamp()}, {merge:true})
+      .catch(()=>{});
+  }
+  if(!silent) announce(on ? 'Interfaz simplificada activada' : 'Interfaz normal activada');
+}
+function chooseSimpleUI(on){
+  setSimpleUI(on, true);
+  announce(on ? 'Interfaz simplificada activada' : 'Continúas con la interfaz normal');
+  goTo('screen-client-home');
+}
+
+function updateSimpleTripStatus(){
+  const box = document.getElementById('simple-trip-status');
+  if(!box) return;
+  if(activeRide){
+    box.hidden = false;
+    box.innerHTML = `Viaje en curso con ${escapeHtml(activeRide.driver.name)}
+      <span class="sub">${escapeHtml(activeRide.driver.vehicle)} · placa ${escapeHtml(activeRide.driver.plate)}</span>`;
+  }else{
+    box.hidden = true;
+    box.innerHTML = '';
+  }
+}
+
+/* Flujo corto: escribe el destino y pide el viaje sin pasar por el modal. */
+async function simpleRequestTrip(){
+  const input = document.getElementById('simple-dest-input');
+  const text = input ? input.value.trim() : '';
+  if(!text){
+    announce('Escribe primero a dónde quieres ir');
+    if(input) input.focus();
+    return;
+  }
+  const selected = addrAutocomplete['simple-dest-input'] && addrAutocomplete['simple-dest-input'].selected;
+  await requestTripToDestination(text, selected || null);
+}
+function simpleShowDriver(){
+  if(!activeRide){ announce('Todavía no tienes un conductor asignado'); return; }
+  goTo('screen-tracking');
+}
+function simpleSpeak(){
+  if(typeof window.a11yStartVoice === 'function'){ window.a11yStartVoice(); return; }
+  openDriverChat();
+}
+
+/* ==============================================================================
+   5. CANCELAR EL VIAJE EN CURSO
+   ============================================================================== */
+function cancelActiveTrip(){
+  if(!activeRide && !currentTrip){
+    announce('No hay ningún viaje activo para cancelar');
+    return;
+  }
+  if(trackTimer){ clearInterval(trackTimer); trackTimer = null; }
+  const name = activeRide ? activeRide.driver.name : null;
+  activeRide = null;
+  currentTrip = null;
+  closeModal('modal-request');
+  updateSimpleTripStatus();
+  goTo('screen-client-home');
+  announce(name ? ('Viaje cancelado. Ya no viajarás con ' + name) : 'Viaje cancelado');
+  if(typeof window.a11yNotify === 'function'){
+    window.a11yNotify('info', 'Viaje cancelado.', '✕');
+  }
+}
+
+/* ==============================================================================
+   6. DESTINO POR VOZ DE PUNTA A PUNTA
+   "Quiero ir al Hospital de Mosquera" fija el destino, calcula la ruta y
+   muestra los conductores compatibles, sin obligar a navegar por pantallas.
+   ============================================================================== */
+function showVoiceDestination(text, state){
+  let el = document.getElementById('voice-dest-banner');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'voice-dest-banner';
+    el.className = 'voice-dest';
+    el.setAttribute('role','status');
+    document.body.appendChild(el);
+  }
+  el.innerHTML = `<span class="k">Destino reconocido</span>
+    <span class="v">${escapeHtml(text)}</span>
+    <span class="s">${escapeHtml(state || 'Calculando la ruta…')}</span>`;
+  clearTimeout(el._t);
+  el._t = setTimeout(()=>{ if(el && el.parentNode) el.remove(); }, 6000);
+}
+
+/* Punto único de entrada usado por la voz y por la interfaz simplificada. */
+async function requestTripToDestination(text, geoHint){
+  const clean = (text||'').replace(/[.,;]+$/,'').trim();
+  if(!clean) return;
+  if(!userLatLng){ announce('Primero necesitamos tu ubicación'); goTo('screen-location'); return; }
+
+  showVoiceDestination(clean, 'Buscando la dirección…');
+  let geo = geoHint;
+  if(!geo){
+    try{ geo = await geocodeAddress(clean); }catch(e){ geo = null; }
+  }
+  if(!geo){
+    showVoiceDestination(clean, 'No encontramos ese lugar. Intenta con más detalle.');
+    announce('No encontramos ese lugar en Colombia. Intenta con más detalle.');
+    return;
+  }
+
+  openRequestFlow();
+  const destInput = document.getElementById('dest-address');
+  if(destInput) destInput.value = geo.label || clean;
+  addrAutocomplete['dest-address'].selected = geo;
+  currentTrip = null;
+
+  showVoiceDestination(clean, 'Calculando la ruta y buscando conductores compatibles…');
+  announce('Destino reconocido: ' + clean + '. Calculando la ruta.');
+  await calculateTrip();
+
+  const n = currentTrip && currentTrip.rankedDrivers ? currentTrip.rankedDrivers.length : 0;
+  showVoiceDestination(clean, n ? (n + ' conductores compatibles disponibles') : 'Sin conductores compatibles por ahora');
+  if(n){
+    const best = currentTrip.rankedDrivers[0];
+    announce(`Ruta lista. ${n} conductores disponibles. El más compatible es ${best.name}, con ${best.compat.percent} por ciento de compatibilidad.`);
+    if(typeof window.a11ySpeak === 'function'){
+      window.a11ySpeak(`Destino ${clean}. ${best.name}, ${best.compat.percent} por ciento de compatibilidad. Di confirmar para pedir el viaje.`, true);
+    }
+  }
+}
+
+/* Repite en voz alta el estado actual, para "repetir información". */
+function repeatCurrentInfo(){
+  let msg;
+  if(activeRide){
+    msg = `Viaje con ${activeRide.driver.name}, ${activeRide.driver.vehicle}, placa ${activeRide.driver.plate}. Destino ${activeRide.destAddress || 'registrado'}. Tarifa ${formatCOP(activeRide.fare)}.`;
+  }else if(currentTrip && currentTrip.chosenDriver){
+    msg = `Conductor seleccionado: ${currentTrip.chosenDriver.name}, ${currentTrip.chosenDriver.compat.percent} por ciento de compatibilidad. Tarifa ${formatCOP(currentTrip.fare)}. Di confirmar para pedir el viaje.`;
+  }else{
+    msg = 'No hay ningún viaje en curso. Di: quiero ir a, y el nombre del lugar.';
+  }
+  announce(msg);
+  if(typeof window.a11ySpeak === 'function') window.a11ySpeak(msg, true);
+  if(typeof window.a11yToast === 'function') window.a11yToast(msg, '', 'ℹ');
+}
+
+function whereIsMyDriver(){
+  if(!activeRide){
+    const msg = 'Todavía no tienes un conductor asignado.';
+    announce(msg);
+    if(typeof window.a11ySpeak === 'function') window.a11ySpeak(msg, true);
+    return;
+  }
+  goTo('screen-tracking');
+  const status = (document.getElementById('tracking-status')||{}).textContent || '';
+  const dist = (document.getElementById('track-dist')||{}).textContent || '';
+  const msg = `${activeRide.driver.name}. ${status.trim()}. Faltan ${dist} kilómetros.`;
+  announce(msg);
+  if(typeof window.a11ySpeak === 'function') window.a11ySpeak(msg, true);
+}
+
+/* ==============================================================================
+   7. INTERFAZ DE EMERGENCIA (SOS)
+   ============================================================================== */
+const SOS_TYPES = {
+  ayuda:       {label:'Necesito ayuda', icon:'🙋'},
+  accidente:   {label:'Accidente', icon:'💥'},
+  medica:      {label:'Emergencia médica', icon:'🚑'},
+  inseguridad: {label:'Me siento inseguro o insegura', icon:'⚠️'},
+  otro:        {label:'Otro problema', icon:'❓'}
+};
+let emergencyAlert = null;
+
+function triggerEmergency(){
+  document.getElementById('sos-step-confirm').classList.remove('hidden');
+  document.getElementById('sos-step-active').classList.add('hidden');
+  openModal('modal-emergency');
+  announce('Pantalla de emergencia abierta. Elige qué está pasando o cancela.');
+}
+function closeEmergency(){
+  closeModal('modal-emergency');
+  announce('Emergencia cancelada. No se envió ninguna alerta.');
+}
+
+function confirmEmergency(type){
+  const info = SOS_TYPES[type] || SOS_TYPES.otro;
+  const now = new Date();
+  emergencyAlert = {type, label: info.label, at: now};
+
+  document.getElementById('sos-step-confirm').classList.add('hidden');
+  document.getElementById('sos-step-active').classList.remove('hidden');
+  document.getElementById('sos-type-line').textContent = info.icon + ' ' + info.label;
+
+  const facts = [
+    ['Motivo', info.label],
+    ['Hora de activación', now.toLocaleTimeString('es-CO')],
+    ['Tu ubicación', userAddress || (userLatLng ? `${userLatLng.lat.toFixed(5)}, ${userLatLng.lng.toFixed(5)}` : 'No disponible')],
+    ['Coordenadas', userLatLng ? `${userLatLng.lat.toFixed(5)}, ${userLatLng.lng.toFixed(5)}` : 'No disponibles'],
+    ['Conductor', activeRide ? activeRide.driver.name : 'Sin viaje en curso'],
+    ['Vehículo', activeRide ? `${activeRide.driver.vehicle} · placa ${activeRide.driver.plate}` : '—'],
+    ['Destino del viaje', activeRide ? (activeRide.destAddress || 'Registrado en el viaje') : '—'],
+    ['Contacto de emergencia', currentProfile && currentProfile.contactoNombre
+      ? `${currentProfile.contactoNombre}${currentProfile.contactoTelefono ? ' · ' + currentProfile.contactoTelefono : ''}`
+      : 'No registrado']
+  ];
+  document.getElementById('sos-facts').innerHTML = facts.map(([k,v])=>
+    `<div class="sos-fact"><span class="k">${escapeHtml(k)}</span><span class="v">${escapeHtml(String(v))}</span></div>`
+  ).join('');
+
+  const steps = [
+    'Notificación enviada al contacto de emergencia',
+    'Ubicación en tiempo real compartida',
+    'Datos del conductor y del vehículo enviados con la alerta',
+    'Alerta registrada en el centro de soporte de AccessRide'
+  ];
+  document.getElementById('sos-steps').innerHTML = steps.map(s=>
+    `<li><span class="tick" aria-hidden="true">✓</span><span>${escapeHtml(s)} <span class="sim">(simulación)</span></span></li>`
+  ).join('');
+
+  const msg = 'Alerta de emergencia activada: ' + info.label + '. Tu contacto de emergencia fue notificado y tu ubicación está compartida.';
+  announce(msg);
+  if(typeof window.a11yNotify === 'function') window.a11yNotify('sos', msg, '🆘');
+
+  if(session && session.uid){
+    db.collection(USERS_COLLECTION).doc(session.uid).collection('alertas').add({
+      tipo: 'sos',
+      motivo: type,
+      motivoTexto: info.label,
+      ubicacion: userLatLng ? {lat:userLatLng.lat, lng:userLatLng.lng} : null,
+      direccion: userAddress || '',
+      conductor: activeRide ? activeRide.driver.name : null,
+      placa: activeRide ? activeRide.driver.plate : null,
+      destino: activeRide ? (activeRide.destAddress || '') : '',
+      creadoEn: serverTimestamp()
+    }).catch(err=>console.warn('No se registró la alerta:', err));
+  }
+}
+
+function cancelEmergencyAlert(){
+  emergencyAlert = null;
+  closeModal('modal-emergency');
+  announce('Alerta de emergencia cancelada');
+  if(typeof window.a11yToast === 'function') window.a11yToast('Alerta de emergencia cancelada', 'ok', '✓');
+}
+function shareEmergencyLocation(){
+  const coords = userLatLng ? `${userLatLng.lat.toFixed(5)}, ${userLatLng.lng.toFixed(5)}` : 'no disponible';
+  const msg = 'Ubicación compartida con tu contacto de emergencia (simulación): ' + coords;
+  announce(msg);
+  if(typeof window.a11yToast === 'function') window.a11yToast(msg, 'ok', '📍');
+  else alert(msg);
+}
+function showEmergencyTripInfo(){
+  if(!activeRide){
+    const msg = 'No hay un viaje en curso en este momento.';
+    announce(msg);
+    if(typeof window.a11yToast === 'function') window.a11yToast(msg, '', '🚐'); else alert(msg);
+    return;
+  }
+  const d = activeRide.driver;
+  const msg = `${d.name} · ${d.vehicle} · placa ${d.plate} · destino ${activeRide.destAddress || 'registrado'} · tarifa ${formatCOP(activeRide.fare)}`;
+  announce(msg);
+  if(typeof window.a11yToast === 'function') window.a11yToast(msg, '', '🚐'); else alert(msg);
+}
+
+
 /* ---------- Init ---------- */
 document.addEventListener('DOMContentLoaded', ()=>{
   initTheme();
   updateAvatarPreview();
+  renderA11yProfileForm('c-a11y-profile', emptyA11yProfile());
+  /* Se restaura la elección de interfaz hecha en una sesión anterior. */
+  try{
+    const saved = localStorage.getItem(SIMPLE_KEY);
+    if(saved !== null) setSimpleUI(saved === 'on', true);
+  }catch(e){}
 });
 </script>
 <script>
@@ -3408,9 +4592,21 @@ function stopListening(){
   if(f) f.classList.remove('listening');
 }
 
+/* Reconoce el destino sin importar el artículo ("a" o "al") y sin exigir
+   navegar manualmente por pantallas: "Quiero ir a", "Quiero ir al", "Llévame
+   a/al", "Solicitar/Pedir viaje a/al" quedan cubiertas con una sola regex. */
+const DEST_VOICE_RE = /^(?:ll[eé]vame al?|vamos al?|quiero ir al?|voy al?|ir hasta|destino al?|destino|solicitar (?:un )?viaje al?|pedir (?:un )?viaje al?)\s+(.{3,})$/;
+
 const COMMANDS = [
   { re:/(ay[uú]dame|qu[eé] puedo decir|comandos)/, run:()=>{ showVoiceHelp(); } },
   { re:/(emergencia|auxilio|s\.?o\.?s\.?|p[aá]nico)/, run:()=>{ triggerEmergency(); } },
+  /* Estos comandos son más específicos que "cerrar/cancelar" y deben
+     evaluarse antes que ese genérico, o "cancelar viaje" solo cerraría
+     un modal en vez de cancelar el viaje de verdad. */
+  { re:/(cancelar (el )?viaje|cancela (el )?viaje)/, run:()=>{ cancelActiveTrip(); } },
+  { re:/(mostrar conductores|ver conductores|qu[eé] conductores hay|conductores disponibles)/, run:()=>{ showAvailableDriversByVoice(); } },
+  { re:/(repetir( la)? informaci[oó]n|repite( la)? informaci[oó]n|qu[eé] est[aá] pasando)/, run:()=>{ repeatCurrentInfo(); } },
+  { re:/(d[oó]nde est[aá] mi conductor|d[oó]nde va mi conductor|cu[aá]ndo llega mi conductor)/, run:()=>{ whereIsMyDriver(); } },
   { re:/(cerrar|cancelar|atr[aá]s|volver)/, run:()=>{
       if(!window.a11yCloseTopModal()) goTo('screen-client-home');
       announce('Cerrado');
@@ -3429,14 +4625,13 @@ const COMMANDS = [
   { re:/(texto|letra).*(m[aá]s grande|aumentar|grande)/, run:()=>window.a11yFontStep(0.1) },
   { re:/(texto|letra).*(m[aá]s peque|reducir|peque)/, run:()=>window.a11yFontStep(-0.1) },
   { re:/(leer|l[eé]eme).*(pantalla|esto|contenido)/, run:()=>readScreenAloud() },
-  { re:/(accesibilidad|ajustes|configuraci[oó]n)/, run:()=>window.openModal('modal-settings') },
-  { re:/^(?:ll[eé]vame a|vamos a|ir hasta|destino|quiero ir a)\s+(.{3,})$/, run:(m)=>setDestinationByVoice(m[1]) }
+  { re:/(accesibilidad|ajustes|configuraci[oó]n)/, run:()=>window.openModal('modal-settings') }
 ];
 
 function handleVoiceCommand(said){
   // El destino dictado se evalúa primero para no confundirlo con la navegación.
-  const destMatch = said.match(/^(?:ll[eé]vame a|vamos a|ir hasta|destino|quiero ir a)\s+(.{3,})$/);
-  if(destMatch){ setDestinationByVoice(destMatch[1]); return; }
+  const destMatch = said.match(DEST_VOICE_RE);
+  if(destMatch){ requestTripToDestination(destMatch[1]); return; }
   for(const c of COMMANDS){
     const m = said.match(c.re);
     if(m){ try{ c.run(m); }catch(e){ console.warn(e); } return; }
@@ -3445,31 +4640,43 @@ function handleVoiceCommand(said){
   announce('No entendí el comando');
 }
 
-async function setDestinationByVoice(text){
-  const clean = text.replace(/[.,;]+$/,'').trim();
-  try{
-    if(typeof openRequestFlow === 'function') openRequestFlow();
-    const input = document.getElementById('dest-address');
-    if(!input) return;
-    input.value = clean;
-    announce('Buscando ' + clean);
-    if(typeof geocodeAddress === 'function'){
-      const geo = await geocodeAddress(clean);
-      if(geo && typeof addrAutocomplete !== 'undefined'){
-        addrAutocomplete['dest-address'].selected = geo;
-        notify('info', 'Destino fijado: ' + clean + '. Di “calcular ruta” para continuar.', '📍');
-        return;
-      }
-    }
-    toast('Escribí “' + clean + '” como destino. Revísalo antes de calcular la ruta.', '', '📍');
-  }catch(e){ console.warn(e); }
+/* Lee en voz alta / muestra los conductores compatibles disponibles ahora
+   mismo: si ya hay una ruta calculada, reabre esa lista; si no, resume los
+   conductores cercanos del mapa. */
+function showAvailableDriversByVoice(){
+  if(currentTrip && currentTrip.rankedDrivers && currentTrip.rankedDrivers.length){
+    openModal('modal-request');
+    document.getElementById('request-step-1').classList.add('hidden');
+    document.getElementById('request-step-2').classList.remove('hidden');
+    const n = currentTrip.rankedDrivers.length;
+    const best = currentTrip.rankedDrivers[0];
+    const msg = `${n} conductores compatibles disponibles. El más compatible es ${best.name}, con ${best.compat.percent} por ciento de compatibilidad.`;
+    announce(msg);
+    if(typeof window.a11ySpeak === 'function') window.a11ySpeak(msg, true);
+    return;
+  }
+  if(typeof generatedDrivers !== 'undefined' && generatedDrivers.length){
+    goTo('screen-client-home');
+    const ranked = rankDrivers(currentProfile || {}, generatedDrivers).slice(0,3);
+    const msg = ranked.length
+      ? `${generatedDrivers.length} conductores cercanos. Los más compatibles son ${listToText(ranked.map(d=>d.name))}.`
+      : 'No encontramos conductores cercanos por ahora.';
+    announce(msg);
+    if(typeof window.a11ySpeak === 'function') window.a11ySpeak(msg, true);
+    return;
+  }
+  const msg = 'Todavía no hay conductores cargados. Primero comparte tu ubicación.';
+  announce(msg);
+  if(typeof window.a11ySpeak === 'function') window.a11ySpeak(msg, true);
 }
 
 function showVoiceHelp(){
   const list = [
-    '“Solicitar un viaje”', '“Llévame a Centro Comercial Andino”', '“Calcular ruta”',
-    '“Confirmar”', '“Chat con el conductor”', '“Historial”', '“Perfil”',
-    '“Inicio”', '“Cancelar”', '“Emergencia”', '“Modo oscuro”', '“Texto más grande”', '“Leer pantalla”'
+    '“Quiero ir a…” / “Llévame a…”', '“Solicitar viaje a…”', '“Calcular ruta”',
+    '“Confirmar”', '“Mostrar conductores”', '“¿Dónde está mi conductor?”',
+    '“Repetir información”', '“Cancelar viaje”', '“Chat con el conductor”',
+    '“Historial”', '“Perfil”', '“Inicio”', '“Emergencia”',
+    '“Modo oscuro”', '“Texto más grande”', '“Leer pantalla”'
   ];
   toast('Comandos: ' + list.join(' · '), '', '🎤');
   speak('Puedes decir: ' + list.join(', ').replace(/“|”/g,''), true);
@@ -3699,15 +4906,20 @@ if(typeof window.confirmTrip === 'function'){
     return r;
   };
 }
-/* El botón SOS suma aviso visual y háptico al comportamiento original. */
-if(typeof window.triggerEmergency === 'function'){
-  const _triggerEmergency = window.triggerEmergency;
-  window.triggerEmergency = function(){
-    const r = _triggerEmergency.apply(this, arguments);
-    notify('sos', 'Alerta de emergencia activada. Tu contacto de confianza fue notificado.', '🆘');
-    return r;
-  };
-}
+/* El aviso multisensorial (destello, vibración, voz) se dispara cuando la
+   alerta queda confirmada, no al abrir la pantalla de emergencia: así tocar
+   SOS por error no lanza nada. confirmEmergency ya llama a window.a11yNotify,
+   window.a11yToast y window.a11ySpeak, que ya quedaron expuestas más arriba
+   en este mismo módulo; aquí solo se añade el atajo para activar la voz
+   desde la interfaz simplificada sin pasar por el interruptor de Ajustes. */
+window.a11yStartVoice = function(){
+  if(!SR){
+    toast('Este navegador no permite el control por voz. Prueba con Chrome o Edge.', 'alert', '⚠');
+    return;
+  }
+  if(!A.voice){ A.voice = true; persist(); applyAll(); }
+  startListening();
+};
 /* Observa el estado del viaje para lanzar la alerta multisensorial cuando el
    vehículo llega y cuando el viaje termina. */
 function watchTripStatus(){
