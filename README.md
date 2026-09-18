@@ -20,10 +20,14 @@ Publicado con GitHub Pages
 - Detección de ubicación por GPS del navegador, con validación de que el punto esté dentro del territorio colombiano.
 - Mapa interactivo con la ubicación del usuario y conductores cercanos generados alrededor de ese punto.
 - Búsqueda de direcciones con autocompletado, o selección del destino tocando directamente el mapa.
+- Controles de zoom y centrado propios, en botones grandes pensados para uso táctil/móvil, sin duplicar los controles nativos del mapa.
+- Interfaz del mapa aislada del resto de la app: el mapa, sus controles y la atribución de OpenStreetMap nunca se superponen con modales, paneles de ajustes u otras pantallas.
 
 **Solicitud de viaje**
 - Cálculo de ruta por calles reales entre el punto de recogida y el destino, con tarifa estimada según distancia.
-- Recomendación de conductor según compatibilidad: se prioriza a quien mejor cubre las necesidades declaradas en el perfil (rampa/elevador, espacio, apoyo visual o auditivo, ayuda al abordar, mascota), junto con cercanía y calificación.
+- Flota simulada de más de 40 conductores con vehículos y combinaciones de adaptaciones variadas (rampa, elevador, espacio amplio, sujeción de silla, apoyo visual/auditivo, ayuda al abordar, Pet Friendly), para reflejar mejor la diversidad de necesidades de accesibilidad.
+- Recomendación de conductor según compatibilidad: se calcula un porcentaje explicable contra el perfil de accesibilidad completo del usuario (movilidad, comunicación y cognitivo), priorizando siempre las necesidades indispensables, y usando cercanía y calificación como criterios secundarios.
+- Garantía de alta compatibilidad: tanto en "Conductores cercanos" como al elegir conductor para el viaje, el sistema asegura que siempre haya disponible al menos una opción con 80% o más de compatibilidad con el perfil del usuario, sin importar cuántas o cuáles necesidades de accesibilidad tenga registradas.
 - Aviso claro cuando el cálculo de ruta usa una estimación en línea recta por no haber conexión con el servicio de rutas.
 
 **Seguimiento del viaje**
@@ -36,6 +40,14 @@ Publicado con GitHub Pages
 - Historial de viajes realizados, guardado en la cuenta del usuario.
 - Modo oscuro y modo de alto contraste, ajustables en cualquier momento y guardados como preferencia del usuario.
 - Interfaz pensada para lectores de pantalla: anuncios en vivo, foco visible por teclado y áreas táctiles amplias.
+
+## Algoritmo de compatibilidad pasajero–conductor
+
+El perfil de accesibilidad del usuario (categorías de movilidad, comunicación y cognitivo) se traduce en una lista de requisitos, cada uno con un peso y, en los casos que lo ameritan, marcado como **indispensable** (por ejemplo, rampa o elevador para silla de ruedas eléctrica, o comunicación escrita para una persona sorda). Cada conductor tiene un conjunto de capacidades derivadas de su vehículo y experiencia.
+
+- Si un conductor no cubre una necesidad indispensable, su compatibilidad queda limitada aunque esté muy cerca o tenga buena calificación: la cercanía nunca desplaza a una necesidad indispensable.
+- El porcentaje de compatibilidad se explica en la propia tarjeta del conductor ("Ver por qué"), mostrando qué necesidades cubre y cuáles no.
+- El sistema garantiza que, tanto en la lista de conductores cercanos como al elegir conductor para un viaje, siempre exista al menos una opción con 80% o más de compatibilidad: primero se busca en el catálogo completo de conductores simulados, y si ninguno alcanza ese nivel para un perfil particularmente exigente, se agrega un vehículo con adaptación especial que cubre explícitamente todas las necesidades indispensables registradas.
 
 ## Tecnologías propias
 
@@ -80,5 +92,6 @@ Se recomienda revisar y probar el código antes de usarlo en un entorno de produ
 
 - No procesa pagos reales; las tarifas son solo estimaciones.
 - Los conductores y sus ubicaciones son generados aleatoriamente alrededor del usuario, no son conductores reales.
+- La compatibilidad mostrada es un cálculo simulado a partir de datos generados por el propio código, no una verificación real de las capacidades de un vehículo o conductor.
 - El botón de emergencia es una simulación: no contacta a líneas de emergencia reales.
 - Depende de servicios públicos gratuitos (Nominatim, OSRM) que pueden tener límites de uso; si no responden, la app recurre a una estimación en línea recta.
